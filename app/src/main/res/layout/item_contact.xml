@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:gravity="center"
+    android:layout_marginTop="50dp"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/contactImage"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/profile"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedImageView"
+        android:contentDescription="Contact Image"/>
+
+
+    <TextView
+        android:id="@+id/contactName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact Name"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:layout_marginTop="4dp" />
+    <TextView
+        android:id="@+id/contactNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact Name"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:layout_marginTop="4dp" />
+</LinearLayout>

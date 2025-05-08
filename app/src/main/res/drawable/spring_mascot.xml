@@ -1,0 +1,33 @@
+
+<!-- sprig_mascot.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Body -->
+    <path
+        android:fillColor="#90EE90"
+        android:pathData="M60,60m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+    
+    <!-- Eyes -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M45,50m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#000000" 
+        android:pathData="M75,50m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    
+    <!-- Smile -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M45,70 Q60,85 75,70"/>
+        
+    <!-- Leaf on head -->
+    <path
+        android:fillColor="#228B22"
+        android:pathData="M60,20 C65,15 70,15 75,20 C80,25 80,30 75,35 C70,40 65,40 60,35 C55,30 55,25 60,20"/>
+</vector>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "616137537323",
+    "project_id": "sprintly-app",
+    "storage_bucket": "sprintly-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616137537323:android:1b8e966c1266ede6dfb76e",
+        "android_client_info": {
+          "package_name": "com.example.sprintly_app_smd_finale"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC64ipHzieBTZvWdZm6fjvN3513m5EVj10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
