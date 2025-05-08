@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Task Description -->
+        <TextView
+            android:id="@+id/taskDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Task Description"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0" />
+
+        <!-- Priority Level -->
+        <TextView
+            android:id="@+id/taskPriority"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Priority: High"
+            android:textColor="#FF0000"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/taskDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginTop="8dp" />
+
+        <!-- Due Date -->
+        <TextView
+            android:id="@+id/taskDueDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Due Date: 12 May 2025"
+            android:textColor="#7B8D93"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/taskPriority"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginTop="4dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+   >
+
+    <!-- Top App Bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:title="Calendar"
+        android:titleTextColor="@android:color/white"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <!-- Calendar View -->
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:dateTextAppearance="@style/TextAppearance.AppCompat.Large"
+        android:weekDayTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:firstDayOfWeek="1" />
+
+    <!-- Selected Date Header -->
+    <TextView
+        android:id="@+id/selectedDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Events on [Selected Date]"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:textColor="@color/black" />
+
+    <!-- Event List (RecyclerView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/eventList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+    <!-- Floating Action Button (Add Event) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:src="@drawable/add_icon"
+        android:contentDescription="Add Event"
+        android:tint="@android:color/white" />
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottomNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:padding="8dp">
+
+        <!-- Calendar Navigation -->
+        <LinearLayout
+            android:id="@+id/calendarNavItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/calendar" />
+            <TextView
+                android:id="@+id/calendarLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calendar"
+                android:textColor="@color/mild_green" />
+        </LinearLayout>
+
+        <!-- Tasks Navigation -->
+        <LinearLayout
+            android:id="@+id/tasksNavItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/tasks" />
+            <TextView
+                android:id="@+id/tasksLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tasks"
+                android:textColor="@color/mild_green" />
+        </LinearLayout>
+
+        <!-- Home Navigation -->
+        <LinearLayout
+            android:id="@+id/homeNavItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/home" />
+            <TextView
+                android:id="@+id/homeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textColor="@color/mild_green" />
+        </LinearLayout>
+
+        <!-- Profile Navigation -->
+        <LinearLayout
+            android:id="@+id/profileNavItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/profile" />
+            <TextView
+                android:id="@+id/profileLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textColor="@color/mild_green" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
