@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("com.google.firebase:firebase-database")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
@@ -62,7 +63,5 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     //Zego Cloud
     implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
-
-
 }
 

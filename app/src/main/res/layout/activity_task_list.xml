@@ -1,174 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".dashboard">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white">
 
-    <!-- Welcome Text -->
-    <TextView
-        android:id="@+id/welcomeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome"
-        android:textColor="@color/mild_green"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:paddingTop="16dp"
-        android:paddingStart="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Username Text -->
-    <TextView
-        android:id="@+id/usernameText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Devla sb"
-        android:textSize="18sp"
-        android:paddingStart="16dp"
-        app:layout_constraintTop_toBottomOf="@id/welcomeText"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Horizontal RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycleContactList"
+    <!-- Sticky Header -->
+    <LinearLayout
+        android:id="@+id/stickyHeader"
         android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/usernameText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Create New Contact Button -->
-    <Button
-        android:id="@+id/createContactBtn"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create New Contact"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/recycleContactList"
+        android:background="@color/mild_green"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Custom Bottom Navigation Bar -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My Tasks"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAddTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/mild_green"
+            android:text="Add New Task"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <!-- RecyclerView for Task List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTasks"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/stickyHeader"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/task_item_layout"/>
+
+    <!-- Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/bottomNavBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="8dp"
         android:orientation="horizontal"
-        android:padding="8dp"
         android:weightSum="4"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Calendar Nav Item -->
         <LinearLayout
             android:id="@+id/calendarNavItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/calendar"
-                android:contentDescription="Calendar icon" />
-
+                android:src="@drawable/calendar" />
             <TextView
                 android:id="@+id/calendarLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Calendar"
-                android:textColor="@color/mild_green"
-                android:visibility="gone" />
+                android:textColor="@color/mild_green" />
         </LinearLayout>
 
-        <!-- Tasks Nav Item -->
         <LinearLayout
             android:id="@+id/tasksNavItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/tasks"
-                android:contentDescription="Tasks icon" />
-
+                android:src="@drawable/tasks" />
             <TextView
                 android:id="@+id/tasksLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tasks"
-                android:textColor="@color/mild_green"
-                android:visibility="gone" />
+                android:textColor="@color/mild_green" />
         </LinearLayout>
 
-        <!-- Home Nav Item -->
         <LinearLayout
             android:id="@+id/homeNavItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:padding="4dp"
-                android:src="@drawable/home"
-                android:contentDescription="Home icon" />
-
+                android:src="@drawable/home" />
             <TextView
                 android:id="@+id/homeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Home"
-                android:textColor="@color/mild_green"
-                android:visibility="visible" />
+                android:textColor="@color/mild_green" />
         </LinearLayout>
 
-        <!-- Profile Nav Item -->
         <LinearLayout
             android:id="@+id/profileNavItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
-
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/profile"
-                android:contentDescription="Profile icon" />
-
+                android:src="@drawable/profile" />
             <TextView
                 android:id="@+id/profileLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Profile"
-                android:textColor="@color/mild_green"
-                android:visibility="gone" />
+                android:textColor="@color/mild_green" />
         </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

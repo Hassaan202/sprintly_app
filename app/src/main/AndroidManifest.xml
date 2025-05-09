@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Sprintly_app_smd_finale"
         tools:targetApi="31">
         <activity
+            android:name=".task_list"
+            android:exported="false" />
+        <activity
             android:name=".chatting"
             android:exported="false" />
         <activity
