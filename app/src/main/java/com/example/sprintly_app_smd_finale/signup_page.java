@@ -14,6 +14,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -25,13 +27,13 @@ public class signup_page extends AppCompatActivity {
     private TextInputEditText emailInput;
     private TextInputEditText passwordInput;
     private TextInputEditText confirmPasswordInput;
-    private Button signupButton;
-
-    // Firestore reference
-    private FirebaseFirestore db;
     private TextInputEditText nameInput;
     private TextInputEditText phoneInput;
+    private Button signupButton;
 
+    // Firebase references
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,8 @@ public class signup_page extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize Firestore
+        // Initialize Firebase
+        auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         // Initialize UI
@@ -53,13 +56,12 @@ public class signup_page extends AppCompatActivity {
     }
 
     private void initializeUI() {
+        nameInput = findViewById(R.id.nameInput);
+        phoneInput = findViewById(R.id.phoneInput);
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
         signupButton = findViewById(R.id.signupButton);
-        nameInput = findViewById(R.id.nameInput);
-        phoneInput = findViewById(R.id.phoneInput);
-
 
         signupButton.setOnClickListener(v -> validateAndCreateAccount());
     }
@@ -71,7 +73,7 @@ public class signup_page extends AppCompatActivity {
         String password = passwordInput.getText().toString().trim();
         String confirmPassword = confirmPasswordInput.getText().toString().trim();
 
-
+        // Validation
         if (name.isEmpty()) {
             nameInput.setError("Name is required");
             nameInput.requestFocus();
@@ -84,12 +86,12 @@ public class signup_page extends AppCompatActivity {
             return;
         }
 
-        if (!phone.matches("\\d{11}")) { // Simple 10-digit check
+        if (!phone.matches("\\d{11}")) {
             phoneInput.setError("Enter a valid 11-digit number");
             phoneInput.requestFocus();
             return;
         }
-        // Validate email
+
         if (email.isEmpty()) {
             emailInput.setError("Email is required");
             emailInput.requestFocus();
@@ -102,7 +104,6 @@ public class signup_page extends AppCompatActivity {
             return;
         }
 
-        // Validate password
         if (password.isEmpty()) {
             passwordInput.setError("Password is required");
             passwordInput.requestFocus();
@@ -115,7 +116,6 @@ public class signup_page extends AppCompatActivity {
             return;
         }
 
-        // Confirm passwords match
         if (!password.equals(confirmPassword)) {
             confirmPasswordInput.setError("Passwords do not match");
             confirmPasswordInput.requestFocus();
@@ -125,29 +125,26 @@ public class signup_page extends AppCompatActivity {
         // Show progress dialog
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Creating account...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Check if email already exists
-        db.collection("user_info")
-                .whereEqualTo("email", email)
-                .get()
-                .addOnCompleteListener(task -> {
+        // Create user with Firebase Auth
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        if (!task.getResult().isEmpty()) {
-                            progressDialog.dismiss();
-                            Toast.makeText(signup_page.this, "Email already exists", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Create new user document
-                            Map<String, Object> user = new HashMap<>();
-                            user.put("name", name);
-                            user.put("phone", phone);
-                            user.put("email", email);
-                            user.put("password", password);
+                        FirebaseUser firebaseUser = auth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            // Prepare user data for Firestore
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("name", name);
+                            userMap.put("phone", phone);
+                            userMap.put("email", email);
 
-
+                            // Save additional user info under uid
                             db.collection("user_info")
-                                    .add(user)
-                                    .addOnSuccessListener(documentReference -> {
+                                    .document(firebaseUser.getUid())
+                                    .set(userMap)
+                                    .addOnSuccessListener(aVoid -> {
                                         progressDialog.dismiss();
                                         Toast.makeText(signup_page.this, "Account created successfully", Toast.LENGTH_SHORT).show();
                                         startActivity(new Intent(signup_page.this, login.class));
@@ -155,12 +152,12 @@ public class signup_page extends AppCompatActivity {
                                     })
                                     .addOnFailureListener(e -> {
                                         progressDialog.dismiss();
-                                        Toast.makeText(signup_page.this, "Error creating account: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(signup_page.this, "Error saving user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         }
                     } else {
                         progressDialog.dismiss();
-                        Toast.makeText(signup_page.this, "Error checking email: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(signup_page.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

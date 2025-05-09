@@ -60,7 +60,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
         tasksNavItem.setOnClickListener(v -> {
             setSelectedNav(tasksNavItem);
-            // TODO: Start Tasks Activity
+            startActivity(new Intent(main_dashboard.this, task_list.class));
         });
 
         homeNavItem.setOnClickListener(v -> {

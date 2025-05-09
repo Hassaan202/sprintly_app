@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white">
 
     <!-- Sticky Header -->
     <LinearLayout
@@ -29,7 +28,7 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/addNewTaskBtn"
+            android:id="@+id/btnAddTask"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/mild_green"
@@ -39,14 +38,15 @@
 
     <!-- RecyclerView for Task List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/taskRecyclerView"
+        android:id="@+id/rvTasks"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/stickyHeader"
         app:layout_constraintBottom_toTopOf="@id/bottomNavBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/task_item_layout"/>
 
     <!-- Bottom Navigation Bar -->
     <LinearLayout
