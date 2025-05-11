@@ -5,4 +5,5 @@ public interface NavBarListener {
     void onTasksSelected();
     void onHomeSelected();
     void onProfileSelected();
+    void onCodeSelected();
 }
