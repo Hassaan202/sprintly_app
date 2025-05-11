@@ -79,56 +79,47 @@ public class signup_page extends AppCompatActivity {
             nameInput.requestFocus();
             return;
         }
-
         if (phone.isEmpty()) {
             phoneInput.setError("Phone number is required");
             phoneInput.requestFocus();
             return;
         }
-
         if (!phone.matches("\\d{11}")) {
             phoneInput.setError("Enter a valid 11-digit number");
             phoneInput.requestFocus();
             return;
         }
-
         if (email.isEmpty()) {
             emailInput.setError("Email is required");
             emailInput.requestFocus();
             return;
         }
-
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailInput.setError("Please enter a valid email");
             emailInput.requestFocus();
             return;
         }
-
         if (password.isEmpty()) {
             passwordInput.setError("Password is required");
             passwordInput.requestFocus();
             return;
         }
-
         if (password.length() < 6) {
             passwordInput.setError("Password must be at least 6 characters");
             passwordInput.requestFocus();
             return;
         }
-
         if (!password.equals(confirmPassword)) {
             confirmPasswordInput.setError("Passwords do not match");
             confirmPasswordInput.requestFocus();
             return;
         }
 
-        // Show progress dialog
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Creating account...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Create user with Firebase Auth
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -140,7 +131,6 @@ public class signup_page extends AppCompatActivity {
                             userMap.put("phone", phone);
                             userMap.put("email", email);
 
-                            // Save additional user info under uid
                             db.collection("user_info")
                                     .document(firebaseUser.getUid())
                                     .set(userMap)

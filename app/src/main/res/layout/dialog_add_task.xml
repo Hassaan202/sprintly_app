@@ -12,19 +12,12 @@
         android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/etAssignee"
-        android:hint="Assignee"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <EditText
         android:id="@+id/etDueDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Due Date"
         android:focusable="false"
         android:clickable="true" />
-
 
     <EditText
         android:id="@+id/etStatus"

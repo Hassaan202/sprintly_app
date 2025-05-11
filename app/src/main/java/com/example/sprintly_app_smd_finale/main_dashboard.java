@@ -27,6 +27,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     // Navigation items
     private LinearLayout calendarNavItem, tasksNavItem, homeNavItem, profileNavItem;
     private TextView calendarLabel, tasksLabel, homeLabel, profileLabel;
+    private NavBarHelper navBarHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,60 +38,31 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         contacts = new ArrayList<>();
         fetchContactInfo();
 
-        // Initialize navigation items
-        calendarNavItem = findViewById(R.id.calendarNavItem);
-        tasksNavItem = findViewById(R.id.tasksNavItem);
+        navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
+            @Override
+            public void onCalendarSelected() {
+                // TODO: Launch the Calender Activity
+            }
+
+            @Override
+            public void onTasksSelected() {
+                startActivity(new Intent(main_dashboard.this, task_list.class));
+            }
+
+            @Override
+            public void onHomeSelected() {
+                // TODO: No action here
+            }
+
+            @Override
+            public void onProfileSelected() {
+                // TODO: Launch the Profile Activity
+            }
+        });
         homeNavItem = findViewById(R.id.homeNavItem);
-        profileNavItem = findViewById(R.id.profileNavItem);
-
-        // Initialize labels
-        calendarLabel = findViewById(R.id.calendarLabel);
-        tasksLabel = findViewById(R.id.tasksLabel);
-        homeLabel = findViewById(R.id.homeLabel);
-        profileLabel = findViewById(R.id.profileLabel);
-
-        // Set Home as default selected
-        setSelectedNav(homeNavItem);
-
-        // Navigation Listeners
-        calendarNavItem.setOnClickListener(v -> {
-            setSelectedNav(calendarNavItem);
-            // TODO: Start Calendar Activity
-        });
-
-        tasksNavItem.setOnClickListener(v -> {
-            setSelectedNav(tasksNavItem);
-            startActivity(new Intent(main_dashboard.this, task_list.class));
-        });
-
-        homeNavItem.setOnClickListener(v -> {
-            setSelectedNav(homeNavItem);
-            // TODO: Start Home Activity
-        });
-
-        profileNavItem.setOnClickListener(v -> {
-            setSelectedNav(profileNavItem);
-            // TODO: Start Profile Activity
-        });
+        navBarHelper.selectTab(homeNavItem);
     }
 
-    // Method to set the selected navigation and hide the rest
-    private void setSelectedNav(LinearLayout selectedNav) {
-        calendarLabel.setVisibility(View.GONE);
-        tasksLabel.setVisibility(View.GONE);
-        homeLabel.setVisibility(View.GONE);
-        profileLabel.setVisibility(View.GONE);
-
-        if (selectedNav == calendarNavItem) {
-            calendarLabel.setVisibility(View.VISIBLE);
-        } else if (selectedNav == tasksNavItem) {
-            tasksLabel.setVisibility(View.VISIBLE);
-        } else if (selectedNav == homeNavItem) {
-            homeLabel.setVisibility(View.VISIBLE);
-        } else if (selectedNav == profileNavItem) {
-            profileLabel.setVisibility(View.VISIBLE);
-        }
-    }
 
     void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

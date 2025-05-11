@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 if (index <= fullText.length()) {
                     appNameText.setText(fullText.substring(0, index));
                     index++;
-                    textHandler.postDelayed(this, 300); // Speed: 300ms per letter
+                    textHandler.postDelayed(this, 150); // Speed: 300ms per letter
                 }
             }
         };
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }, 3000); // 3 second splash
+        }, 2000); // 2 second splash
     }
 }
 
