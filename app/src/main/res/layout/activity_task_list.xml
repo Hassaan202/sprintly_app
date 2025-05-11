@@ -49,95 +49,17 @@
         tools:listitem="@layout/task_item_layout"/>
 
     <!-- Bottom Navigation Bar -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/bottomNavBar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
-        android:orientation="horizontal"
-        android:weightSum="4"
-        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/rvTasks"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent">
 
-        <LinearLayout
-            android:id="@+id/calendarNavItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/calendar" />
-            <TextView
-                android:id="@+id/calendarLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Calendar"
-                android:textColor="@color/mild_green" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tasksNavItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/tasks" />
-            <TextView
-                android:id="@+id/tasksLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tasks"
-                android:textColor="@color/mild_green" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/homeNavItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/home" />
-            <TextView
-                android:id="@+id/homeLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:textColor="@color/mild_green" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/profileNavItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/profile" />
-            <TextView
-                android:id="@+id/profileLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textColor="@color/mild_green" />
-        </LinearLayout>
-    </LinearLayout>
+        <include layout="@layout/navbar" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

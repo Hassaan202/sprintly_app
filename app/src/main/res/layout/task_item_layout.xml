@@ -8,10 +8,12 @@
     android:layout_margin="8dp">
 
     <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:background="@drawable/task_item_background">
 
         <TextView
             android:id="@+id/tvTitle"
