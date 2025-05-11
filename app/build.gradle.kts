@@ -63,5 +63,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     //Zego Cloud
     implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
+
+    // Gemini
+    implementation ("com.google.ai.client.generativeai:generativeai:0.9.0")
 }
 

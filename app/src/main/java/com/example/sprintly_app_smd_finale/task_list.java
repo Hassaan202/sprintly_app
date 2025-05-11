@@ -15,6 +15,9 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
@@ -39,6 +42,8 @@ public class task_list extends AppCompatActivity {
     String userName;
     private ActionMode actionMode;
     private NavBarHelper navBarHelper;
+    private View taskNavItem;
+
 
     // Setting up the action mode for task selection and operation
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
@@ -184,8 +189,13 @@ public class task_list extends AppCompatActivity {
                 // TODO: launch Calender activity
 
             }
+
+            @Override
+            public void onCodeSelected() {
+                startActivity(new Intent(task_list.this, codeActivity.class));
+            }
         });
-        View taskNavItem = findViewById(R.id.tasksNavItem);
+        taskNavItem = findViewById(R.id.tasksNavItem);
         navBarHelper.selectTab(taskNavItem);
 
         // Connecting the tasks with the user account
@@ -245,5 +255,11 @@ public class task_list extends AppCompatActivity {
                 showAddTaskDialog();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navBarHelper.selectTab(taskNavItem);
     }
 }

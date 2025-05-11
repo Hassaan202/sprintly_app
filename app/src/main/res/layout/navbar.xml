@@ -10,7 +10,7 @@
         android:background="@color/white"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:weightSum="4">
+        android:weightSum="5">
 
         <!-- Calendar Nav Item -->
         <LinearLayout
@@ -105,6 +105,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Profile"
+                android:textColor="@color/mild_green" />
+        </LinearLayout>
+
+        <!-- Code Nav Item -->
+        <LinearLayout
+            android:id="@+id/codeNavItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/code" />
+
+            <TextView
+                android:id="@+id/codeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Code"
                 android:textColor="@color/mild_green" />
         </LinearLayout>
 

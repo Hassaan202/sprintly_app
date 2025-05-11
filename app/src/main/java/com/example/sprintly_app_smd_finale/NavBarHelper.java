@@ -8,11 +8,13 @@ public class NavBarHelper {
     private final View tasksNav;
     private final View homeNav;
     private final View profileNav;
+    private final View codeNav;
 
     private final TextView calendarLabel;
     private final TextView tasksLabel;
     private final TextView homeLabel;
     private final TextView profileLabel;
+    private final TextView codeLabel;
 
     private final NavBarListener listener;
 
@@ -23,11 +25,13 @@ public class NavBarHelper {
         tasksNav      = root.findViewById(R.id.tasksNavItem);
         homeNav       = root.findViewById(R.id.homeNavItem);
         profileNav    = root.findViewById(R.id.profileNavItem);
+        codeNav       = root.findViewById(R.id.codeNavItem);
 
         calendarLabel = root.findViewById(R.id.calendarLabel);
         tasksLabel    = root.findViewById(R.id.tasksLabel);
         homeLabel     = root.findViewById(R.id.homeLabel);
         profileLabel  = root.findViewById(R.id.profileLabel);
+        codeLabel  = root.findViewById(R.id.codeLabel);
 
         View.OnClickListener clicker = v -> {
             selectTab(v);
@@ -39,6 +43,8 @@ public class NavBarHelper {
                 listener.onHomeSelected();
             } else if (v == profileNav) {
                 listener.onProfileSelected();
+            } else if (v == codeNav){
+                listener.onCodeSelected();
             }
         };
 
@@ -46,6 +52,7 @@ public class NavBarHelper {
         tasksNav   .setOnClickListener(clicker);
         homeNav    .setOnClickListener(clicker);
         profileNav .setOnClickListener(clicker);
+        codeNav    .setOnClickListener(clicker);
     }
 
     private void clearAllLabels() {
@@ -53,6 +60,7 @@ public class NavBarHelper {
         tasksLabel   .setVisibility(View.GONE);
         homeLabel    .setVisibility(View.GONE);
         profileLabel .setVisibility(View.GONE);
+        codeLabel    .setVisibility(View.GONE);
     }
 
     public void selectTab(View selectedNav) {
@@ -65,6 +73,8 @@ public class NavBarHelper {
             homeLabel    .setVisibility(View.VISIBLE);
         } else if (selectedNav == profileNav) {
             profileLabel .setVisibility(View.VISIBLE);
+        } else if (selectedNav == codeNav){
+            codeLabel    .setVisibility(View.VISIBLE);
         }
     }
 }

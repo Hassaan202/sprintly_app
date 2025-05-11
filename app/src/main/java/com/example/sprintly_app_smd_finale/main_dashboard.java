@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -58,11 +61,21 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
             public void onProfileSelected() {
                 // TODO: Launch the Profile Activity
             }
+
+            @Override
+            public void onCodeSelected() {
+                startActivity(new Intent(main_dashboard.this, codeActivity.class));
+            }
         });
         homeNavItem = findViewById(R.id.homeNavItem);
         navBarHelper.selectTab(homeNavItem);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navBarHelper.selectTab(homeNavItem);
+    }
 
     void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
