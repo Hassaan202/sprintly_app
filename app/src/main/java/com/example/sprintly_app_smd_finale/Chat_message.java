@@ -4,17 +4,23 @@ public class Chat_message {
     private String message;
     private String time;
     private Timestamp timestamp;
+    private boolean isCurrentUser;
 
 
 
-    public Chat_message(String message, String time, Timestamp timestamp) {
+    public Chat_message(String message, String time, Timestamp timestamp,boolean isCurrentUser ) {
         this.message = message;
         this.time = time;
         this.timestamp = timestamp;
+        this.isCurrentUser=isCurrentUser;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public boolean get_isCurrentUser() {
+        return isCurrentUser;
     }
 
     public String getTime() {

@@ -1,8 +1,10 @@
 package com.example.sprintly_app_smd_finale;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,11 +22,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
         TextView messageTextView, timeTextView;
+        LinearLayout message_bg;
 
         public ChatViewHolder(View view) {
             super(view);
             messageTextView = view.findViewById(R.id.messageText);
             timeTextView = view.findViewById(R.id.messageTime);
+            message_bg=view.findViewById(R.id.messageTextView);
+
         }
     }
 
@@ -41,6 +46,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         Chat_message chat = chatMessages.get(position);
         holder.messageTextView.setText(chat.getMessage());
         holder.timeTextView.setText(chat.getTime());
+        if(chat.get_isCurrentUser()){
+            holder.message_bg.setBackgroundColor(Color.parseColor("#74DF65"));
+        }
     }
 
     @Override

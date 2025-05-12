@@ -16,24 +16,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 public class login extends AppCompatActivity {
 
-    // UI Elements\][
+    // UI Elements
     private TextInputEditText emailInput;
     private TextInputEditText passwordInput;
     private Button loginButton;
     private TextView signUpLink;
 
-    // Firebase references
-    private FirebaseAuth auth;
+    // Firestore reference
     private FirebaseFirestore db;
 
     @Override
@@ -48,8 +45,7 @@ public class login extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize Firebase Auth and Firestore
-        auth = FirebaseAuth.getInstance();
+        // Initialize Firestore
         db = FirebaseFirestore.getInstance();
 
         // Initialize UI
@@ -62,13 +58,13 @@ public class login extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         signUpLink = findViewById(R.id.signUpLink);
 
-        loginButton.setOnClickListener(v -> authenticateUser());
+        loginButton.setOnClickListener(v -> checkUserInFirestore());
         signUpLink.setOnClickListener(v -> {
             startActivity(new Intent(login.this, signup_page.class));
         });
     }
 
-    private void authenticateUser() {
+    private void checkUserInFirestore() {
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
@@ -91,59 +87,44 @@ public class login extends AppCompatActivity {
         }
 
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Logging in...");
-        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Checking credentials...");
         progressDialog.show();
 
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
+        db.collection("user_info")
+                .whereEqualTo("email", email)
+                .whereEqualTo("password", password)
+                .get()
+                .addOnCompleteListener(task -> {
+                    progressDialog.dismiss();
                     if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = auth.getCurrentUser();
-                        if (firebaseUser != null) {
-                            String uid = firebaseUser.getUid();
-                            // Fetch additional user info from Firestore
-                            db.collection("user_info")
-                                    .document(uid)
-                                    .get(Source.DEFAULT)
-                                    .addOnSuccessListener(DocumentSnapshot::getData)
-                                    .addOnCompleteListener(snapshotTask -> {
-                                        progressDialog.dismiss();
-                                        if (snapshotTask.isSuccessful() && snapshotTask.getResult() != null) {
-                                            DocumentSnapshot doc = snapshotTask.getResult();
-                                            String name_user = doc.getString("name");
-                                            String email_user = doc.getString("email");
+                        QuerySnapshot result = task.getResult();
+                        if (!result.isEmpty()) {
+                            DocumentSnapshot document = result.getDocuments().get(0);
+                            String password_user = document.getString("password"); // fetch user's name
+                            String Email_user=document.getString("email");
+                            String name_user=document.getString("name");
+                            String user_id=document.getId();
+                            Toast.makeText(login.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                                            Toast.makeText(login.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(login.this, main_dashboard.class);
-                                            intent.putExtra("USER_ID", uid);
-                                            intent.putExtra("NAME", name_user);
-                                            intent.putExtra("EMAIL", email_user);
+                            // Intent with extra data
+                            Intent intent = new Intent(login.this,main_dashboard.class);
+                            intent.putExtra("USER_Password", password_user); // pass user name
+                            intent.putExtra("EMAIL", Email_user); // pass user name
+                            intent.putExtra("NAME", name_user);
+                            Log.d("DEBUG_LOG", "starting the intent");
 
-                                            // Initialize Zego Cloud
-                                            ZegoUIKitPrebuiltCallInvitationConfig config = new ZegoUIKitPrebuiltCallInvitationConfig();
-                                            ZegoUIKitPrebuiltCallService.init(
-                                                    getApplication(),
-                                                    AppConstants.APP_ID,
-                                                    AppConstants.APP_SIGN,
-                                                    uid,
-                                                    name_user,
-                                                    config
-                                            );
+                            //Initizalizing the zeno cloud
 
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            Toast.makeText(login.this, "Failed to retrieve user data.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(login.this, "Error fetching user info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
+                            ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+                            ZegoUIKitPrebuiltCallService.init(getApplication(),AppConstants.APP_ID,AppConstants.APP_SIGN,user_id,name_user,callInvitationConfig);
+                            Log.d("DEBUG_LOG", "user id:"+user_id+" user name:"+name_user);
+                            startActivity(intent);
+                            finish();
+                        } else { 
+                            Toast.makeText(login.this, "Incorrect email or password", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        progressDialog.dismiss();
-                        Toast.makeText(login.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(login.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }

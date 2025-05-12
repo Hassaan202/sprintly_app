@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp"
+    android:id="@+id/messageTextView"
     android:background="@drawable/edittextbg"
     android:layout_margin="8dp">
 

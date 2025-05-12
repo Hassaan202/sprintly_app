@@ -3,15 +3,11 @@ package com.example.sprintly_app_smd_finale;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,6 +27,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private LinearLayout calendarNavItem, tasksNavItem, homeNavItem, profileNavItem;
     private TextView calendarLabel, tasksLabel, homeLabel, profileLabel;
     private NavBarHelper navBarHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +51,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
             @Override
             public void onHomeSelected() {
-                // TODO: No action here
+                navigateToHome(this);
             }
 
             @Override
@@ -122,5 +119,18 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         intent.putExtra("userID", currentUserId);
         intent.putExtra("contactID", contacts.get(position).getContactId());
         startActivity(intent);
+    }
+    // Method to handle navigation to home dashboard
+    public static void navigateToHome(NavBarListener context) {
+        if (context instanceof android.content.Context) {
+            // Create intent to launch main_dashboard activity
+            Intent intent = new Intent((android.content.Context)context, main_dashboard.class);
+            // FLAG_ACTIVITY_CLEAR_TOP will clear all activities on top of main_dashboard
+            // So when user clicks home, they return to main_dashboard with a fresh state
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            ((android.content.Context)context).startActivity(intent);
+        } else {
+            Log.e("DEBUG_LOG", "Context passed to navigateToHome is not an Android Context");
+        }
     }
 }

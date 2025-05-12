@@ -37,6 +37,7 @@ public class chatting extends AppCompatActivity {
     ChatAdapter chatAdapter;
     private EditText messageInput;
     private ImageView sendButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,20 +54,20 @@ public class chatting extends AppCompatActivity {
         int imageResId = getIntent().getIntExtra("image", R.drawable.profile);
 // zego buttons
         ZegoSendCallInvitationButton call_btn;
-        call_btn=findViewById(R.id.zengo_voiceCall);
+        call_btn = findViewById(R.id.zengo_voiceCall);
         ZegoSendCallInvitationButton video_call_btn;
-        video_call_btn=findViewById(R.id.zengo_videoCall);
+        video_call_btn = findViewById(R.id.zengo_videoCall);
 
         //setting the button for voice call
         call_btn.setIsVideoCall(false);
         call_btn.setResourceID("zego_uikit_call");
-        call_btn.setInvitees(Collections.singletonList(new ZegoUIKitUser(contactId,name)));
-        Log.d("DEBUG_LOG", "target user id voice call"+contactId);
+        call_btn.setInvitees(Collections.singletonList(new ZegoUIKitUser(contactId, name)));
+        Log.d("DEBUG_LOG", "target user id voice call" + contactId);
         //setting the button for video call
         video_call_btn.setIsVideoCall(true);
         video_call_btn.setResourceID("zego_uikit_call");
-        Log.d("DEBUG_LOG", "target user id video call"+contactId);
-        video_call_btn.setInvitees(Collections.singletonList(new ZegoUIKitUser(contactId,name)));
+        Log.d("DEBUG_LOG", "target user id video call" + contactId);
+        video_call_btn.setInvitees(Collections.singletonList(new ZegoUIKitUser(contactId, name)));
 
         profileImageView.setImageResource(imageResId);
         nameTextView.setText(name);
@@ -82,6 +83,7 @@ public class chatting extends AppCompatActivity {
 
         sendButton.setOnClickListener(v -> sendMessage());
     }
+
     private void sendMessage() {
         String messageText = messageInput.getText().toString().trim();
         if (messageText.isEmpty()) {
@@ -94,7 +96,7 @@ public class chatting extends AppCompatActivity {
         String formattedTime = sdf.format(timestamp.toDate());
 
         // Create message object
-        Chat_message newMessage = new Chat_message(messageText, formattedTime, timestamp);
+        Chat_message newMessage = new Chat_message(messageText, formattedTime, timestamp, true);
 
         // Add to RecyclerView
         chatMessages.add(newMessage);
@@ -114,7 +116,7 @@ public class chatting extends AppCompatActivity {
                 .document(userId)
                 .collection("contacts")
                 .document(contactId)
-                .collection("chats_data")
+                .collection("chats_info")
                 .add(messageData)
                 .addOnSuccessListener(documentReference -> {
                     // Clear input after successful send
@@ -128,11 +130,12 @@ public class chatting extends AppCompatActivity {
                 .document(contactId) // Y
                 .collection("contacts")
                 .document(userId) // X
-                .collection("chats_data")
+                .collection("chats_info")
                 .add(receiverMessage)
                 .addOnSuccessListener(documentReference -> {
                     Log.e("DEBUG_LOG", "message saved in receiver: ");
                 });
+        fetchChatMessages();
 
     }
 
@@ -142,36 +145,44 @@ public class chatting extends AppCompatActivity {
                 .document(userId)
                 .collection("contacts")
                 .document(contactId)
-                .collection("chats_data");
+                .collection("chats_info");
 
-        chatsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-
-                if (doc.contains("curr_text") && doc.contains("time")) {
-                    String message = doc.getString("curr_text");
-                    Timestamp time = doc.getTimestamp("time");
-                    String formattedTime = sdf.format(time.toDate());
-                    chatMessages.add(new Chat_message(message, formattedTime, time));
-                }
-
-                if (doc.contains("receiver_text") && doc.contains("time_recv")) {
-                    String message = doc.getString("receiver_text");
-                    Timestamp time = doc.getTimestamp("time_recv");
-                    String formattedTime = sdf.format(time.toDate());
-                    chatMessages.add(new Chat_message(message, formattedTime, time));
-                }
+        // 🟢 Real-time listener
+        chatsRef.addSnapshotListener((queryDocumentSnapshots, error) -> {
+            if (error != null) {
+                Log.e("DEBUG_LOG", "Listen failed.", error);
+                return;
             }
 
-            // Sort by timestamp ascending
-            Collections.sort(chatMessages, Comparator.comparing(Chat_message::getTimestamp));
+            if (queryDocumentSnapshots != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                chatMessages.clear(); // Clear the list to avoid duplication
 
-            // Notify adapter
-            chatAdapter.notifyDataSetChanged();
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
 
-        }).addOnFailureListener(e -> {
-            Log.e("DEBUG_LOG", "Error fetching chats: ", e);
+                    if (doc.contains("curr_text") && doc.contains("time")) {
+                        String message = doc.getString("curr_text");
+                        Timestamp time = doc.getTimestamp("time");
+                        String formattedTime = sdf.format(time.toDate());
+                        chatMessages.add(new Chat_message(message, formattedTime, time, true));
+                    }
+
+                    if (doc.contains("receiver_text") && doc.contains("time_recv")) {
+                        String message = doc.getString("receiver_text");
+                        Timestamp time = doc.getTimestamp("time_recv");
+                        String formattedTime = sdf.format(time.toDate());
+                        chatMessages.add(new Chat_message(message, formattedTime, time, false));
+                    }
+                }
+
+                // Sort by timestamp ascending
+                Collections.sort(chatMessages, Comparator.comparing(Chat_message::getTimestamp));
+
+                // Notify adapter and scroll to the latest message
+                chatAdapter.notifyDataSetChanged();
+                chatRecyclerView.scrollToPosition(chatMessages.size() - 1);
+            }
         });
     }
+
 }

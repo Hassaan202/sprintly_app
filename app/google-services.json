@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "1013580042503",
-    "firebase_url": "https://smd-project-e77c5-default-rtdb.firebaseio.com",
-    "project_id": "smd-project-e77c5",
-    "storage_bucket": "smd-project-e77c5.firebasestorage.app"
+    "project_number": "616137537323",
+    "project_id": "sprintly-app",
+    "storage_bucket": "sprintly-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1013580042503:android:4d322452cd3525c660b5a2",
+        "mobilesdk_app_id": "1:616137537323:android:1b8e966c1266ede6dfb76e",
         "android_client_info": {
           "package_name": "com.example.sprintly_app_smd_finale"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDKs8Matn-rh0Hg9C2NJO1MiYLuTSDeWCI"
+          "current_key": "AIzaSyC64ipHzieBTZvWdZm6fjvN3513m5EVj10"
         }
       ],
       "services": {

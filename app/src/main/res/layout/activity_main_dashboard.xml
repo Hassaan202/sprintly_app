@@ -45,9 +45,11 @@
         android:id="@+id/createContactBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create New Contact"
         android:layout_gravity="center"
-        android:paddingBottom="16dp" />
+        android:backgroundTint="@color/mild_green"
+        android:paddingBottom="16dp"
+        android:text="Create New Contact"
+        />
 
     </LinearLayout>
 
