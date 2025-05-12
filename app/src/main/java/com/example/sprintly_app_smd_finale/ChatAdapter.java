@@ -47,7 +47,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         holder.messageTextView.setText(chat.getMessage());
         holder.timeTextView.setText(chat.getTime());
         if(chat.get_isCurrentUser()){
-            holder.message_bg.setBackgroundColor(Color.parseColor("#74DF65"));
+            holder.message_bg.setBackgroundResource(R.drawable.sender_chat_bg);
         }
     }
 
