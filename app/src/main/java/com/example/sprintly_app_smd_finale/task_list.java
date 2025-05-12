@@ -45,6 +45,7 @@ public class task_list extends AppCompatActivity {
     private View taskNavItem;
 
 
+
     // Setting up the action mode for task selection and operation
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
@@ -161,6 +162,7 @@ public class task_list extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_task_list);
+//getting the email
 
         // SETTING UP THE RECYCLER VIEW
         rvTasks = findViewById(R.id.rvTasks);
@@ -181,7 +183,10 @@ public class task_list extends AppCompatActivity {
 
             @Override
             public void onHomeSelected() {
-                startActivity(new Intent(task_list.this, main_dashboard.class));
+                 String email = getIntent().getStringExtra("EMAIL");
+                Intent intent = new Intent(task_list.this, main_dashboard.class);
+                intent.putExtra("EMAIL", email);
+                startActivity(intent);
             }
 
             @Override

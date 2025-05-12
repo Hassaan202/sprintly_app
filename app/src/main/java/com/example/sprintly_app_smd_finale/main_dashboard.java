@@ -1,8 +1,14 @@
 package com.example.sprintly_app_smd_finale;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -11,11 +17,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class main_dashboard extends AppCompatActivity implements chat_interface {
 
@@ -27,13 +36,142 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private LinearLayout calendarNavItem, tasksNavItem, homeNavItem, profileNavItem;
     private TextView calendarLabel, tasksLabel, homeLabel, profileLabel;
     private NavBarHelper navBarHelper;
+    private String email;
+    // Declare your button
+    Button createContactBtn;
+    Dialog contactDialog;
 
+    interface OnContactCheckListener {
+        void onCheck(boolean exists);
+    }
+    interface OnContactIdFetchListener {
+        void onIdFetched(String contactId);
+    }
+    private void checkIfContactExists(String contactNumber, OnContactCheckListener callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        db.collection("user_info")
+                .document(currentUserId)
+                .collection("contacts")
+                .whereEqualTo("number", contactNumber)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    callback.onCheck(!queryDocumentSnapshots.isEmpty());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DEBUG_LOG", "Error checking contact: ", e);
+                    callback.onCheck(false);  // Default to false if there is an error
+                });
+    }
+    // Function to fetch the Doc ID of the contact
+    private void fetchContactDocId(String contactNumber, OnContactIdFetchListener callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("user_info")
+                .whereEqualTo("number", contactNumber)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                        callback.onIdFetched(doc.getId());
+                    } else {
+                        callback.onIdFetched(null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DEBUG_LOG", "Failed to fetch contact Doc ID: ", e);
+                    callback.onIdFetched(null);
+                });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main_dashboard);
+
+        // Initialize the button
+        createContactBtn = findViewById(R.id.createContactBtn);
+
+        // Initialize the dialog
+        contactDialog = new Dialog(this);
+        contactDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // Hide the default title
+        contactDialog.setContentView(R.layout.dialog_new_contact);
+        contactDialog.setCancelable(false); // Prevents closing by tapping outside
+
+        // Set the width and height programmatically
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(contactDialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        contactDialog.getWindow().setAttributes(lp);
+
+        // Reference to the close button inside the dialog
+        ImageButton closeButton = contactDialog.findViewById(R.id.closeButton);
+
+        // Dialog components
+        Button findContactButton = contactDialog.findViewById(R.id.findContactButton);
+        TextInputEditText contactNameEditText = contactDialog.findViewById(R.id.contactNameEditText);
+        TextInputEditText contactNumberEditText = contactDialog.findViewById(R.id.contactNumberEditText);
+
+// Firestore reference
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        findContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String contactName = contactNameEditText.getText().toString().trim();
+                String contactNumber = contactNumberEditText.getText().toString().trim();
+
+                if (contactNumber.isEmpty()) {
+                    contactNumberEditText.setError("Enter a valid number");
+                    return;
+                }
+                checkIfContactExists(contactNumber, exists -> {
+                    if (exists) {
+                        contactNumberEditText.setError("Contact already exists!");
+                    } else {
+                        fetchContactDocId(contactNumber, contactId -> {
+                            if (contactId != null) {
+                                Map<String, Object> contactData = new HashMap<>();
+                                contactData.put("name", contactName);
+                                contactData.put("number", contactNumber);
+
+                                db.collection("user_info")
+                                        .document(currentUserId)
+                                        .collection("contacts")
+                                        .document(contactId)
+                                        .set(contactData)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("DEBUG_LOG", "Contact added successfully with Doc ID.");
+                                            fetchContactInfo();
+                                            contactDialog.dismiss();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("DEBUG_LOG", "Failed to add contact with Doc ID: ", e);
+                                        });
+                            } else {
+                                Log.e("DEBUG_LOG", "Contact not found in user_info.");
+                            }
+                        });
+                    }
+                });
+
+
+            }
+        });
+
+        // Handle close button click inside the dialog
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contactDialog.dismiss(); // Closes the dialog
+            }
+        });
+        createContactBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contactDialog.show(); // Displays the dialog
+            }
+        });
 
         contacts = new ArrayList<>();
         fetchContactInfo();
@@ -46,8 +184,12 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
             @Override
             public void onTasksSelected() {
-                startActivity(new Intent(main_dashboard.this, task_list.class));
+                String email = getIntent().getStringExtra("EMAIL");
+                Intent intent = new Intent(main_dashboard.this, task_list.class);
+                intent.putExtra("EMAIL", email);
+                startActivity(intent);
             }
+
 
             @Override
             public void onHomeSelected() {
@@ -76,7 +218,8 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
     void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String email = getIntent().getStringExtra("EMAIL");
+        email = getIntent().getStringExtra("EMAIL");
+        contacts.clear(); // Clear the old list to avoid duplicates
 
         db.collection("user_info")
                 .whereEqualTo("email", email)
@@ -93,13 +236,16 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                                     for (DocumentSnapshot doc : querySnapshot) {
                                         String name = doc.getString("name");
                                         String number = doc.getString("number");
+                                        if(name==null || number==null){
+                                            continue;
+                                        }
                                         Contact newContact = new Contact(name, number, R.drawable.luffy);
                                         newContact.setContactId(doc.getId());
                                         contacts.add(newContact);
                                     }
 
                                     RecyclerView recycler_contact = findViewById(R.id.recycleContactList);
-                                    recycler_contact.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                                    recycler_contact.setLayoutManager(new LinearLayoutManager(this));
                                     recycler_contact.setAdapter(new ContactsAdapter(getApplicationContext(), contacts, this));
                                 })
                                 .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to fetch contacts: ", e));

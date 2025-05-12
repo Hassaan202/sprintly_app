@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -73,82 +72,109 @@ public class signup_page extends AppCompatActivity {
         String password = passwordInput.getText().toString().trim();
         String confirmPassword = confirmPasswordInput.getText().toString().trim();
 
-        // Validation
-        if (name.isEmpty()) {
-            nameInput.setError("Name is required");
-            nameInput.requestFocus();
-            return;
-        }
-        if (phone.isEmpty()) {
-            phoneInput.setError("Phone number is required");
-            phoneInput.requestFocus();
-            return;
-        }
-        if (!phone.matches("\\d{11}")) {
-            phoneInput.setError("Enter a valid 11-digit number");
-            phoneInput.requestFocus();
-            return;
-        }
-        if (email.isEmpty()) {
-            emailInput.setError("Email is required");
-            emailInput.requestFocus();
-            return;
-        }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Please enter a valid email");
-            emailInput.requestFocus();
-            return;
-        }
-        if (password.isEmpty()) {
-            passwordInput.setError("Password is required");
-            passwordInput.requestFocus();
-            return;
-        }
-        if (password.length() < 6) {
-            passwordInput.setError("Password must be at least 6 characters");
-            passwordInput.requestFocus();
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            confirmPasswordInput.setError("Passwords do not match");
-            confirmPasswordInput.requestFocus();
-            return;
-        }
+        if (!validateInputs(name, phone, email, password, confirmPassword)) return;
 
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Creating account...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
+        db.collection("user_info")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = auth.getCurrentUser();
-                        if (firebaseUser != null) {
-                            // Prepare user data for Firestore
-                            Map<String, Object> userMap = new HashMap<>();
-                            userMap.put("name", name);
-                            userMap.put("phone", phone);
-                            userMap.put("email", email);
-
-                            db.collection("user_info")
-                                    .document(firebaseUser.getUid())
-                                    .set(userMap)
-                                    .addOnSuccessListener(aVoid -> {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(signup_page.this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(signup_page.this, login.class));
-                                        finish();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(signup_page.this, "Error saving user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
+                        if (!task.getResult().isEmpty()) {
+                            progressDialog.dismiss();
+                            Toast.makeText(signup_page.this, "Email already exists", Toast.LENGTH_SHORT).show();
+                        } else {
+                            createUserInFirestore(name, phone, email, password, progressDialog);
                         }
                     } else {
                         progressDialog.dismiss();
-                        Toast.makeText(signup_page.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(signup_page.this, "Error checking email: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private boolean validateInputs(String name, String phone, String email, String password, String confirmPassword) {
+        if (name.isEmpty()) {
+            nameInput.setError("Name is required");
+            nameInput.requestFocus();
+            return false;
+        }
+        if (phone.isEmpty()) {
+            phoneInput.setError("Phone number is required");
+            phoneInput.requestFocus();
+            return false;
+        }
+        if (!phone.matches("\\d{11}")) {
+            phoneInput.setError("Enter a valid 11-digit number");
+            phoneInput.requestFocus();
+            return false;
+        }
+        if (email.isEmpty()) {
+            emailInput.setError("Email is required");
+            emailInput.requestFocus();
+            return false;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInput.setError("Please enter a valid email");
+            emailInput.requestFocus();
+            return false;
+        }
+        if (password.isEmpty()) {
+            passwordInput.setError("Password is required");
+            passwordInput.requestFocus();
+            return false;
+        }
+        if (password.length() < 6) {
+            passwordInput.setError("Password must be at least 6 characters");
+            passwordInput.requestFocus();
+            return false;
+        }
+        if (!password.equals(confirmPassword)) {
+            confirmPasswordInput.setError("Passwords do not match");
+            confirmPasswordInput.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private void createUserInFirestore(String name, String phone, String email, String password, ProgressDialog progressDialog) {
+        Map<String, Object> user = new HashMap<>();
+        user.put("name", name);
+        user.put("phone", phone);
+        user.put("email", email);
+        user.put("password", password);
+
+        db.collection("user_info")
+                .add(user)
+                .addOnSuccessListener(documentReference -> {
+                    String newUserId = documentReference.getId();
+
+                    Map<String, Object> initialContact = new HashMap<>();
+                    initialContact.put("name", null);
+                    initialContact.put("number", null);
+
+                    db.collection("user_info")
+                            .document(newUserId)
+                            .collection("contacts")
+                            .add(initialContact)
+                            .addOnSuccessListener(unused -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(signup_page.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(signup_page.this, login.class));
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(signup_page.this, "Error creating initial contact: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(signup_page.this, "Error creating account: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }
