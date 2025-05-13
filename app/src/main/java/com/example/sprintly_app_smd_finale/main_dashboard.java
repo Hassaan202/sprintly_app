@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -20,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.sprintly_app_smd_finale.ProfileActivity;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,12 +34,12 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private String selectedContactId;
 
     // Navigation items
+    private NavBarHelper navBarHelper;
     private LinearLayout calendarNavItem, tasksNavItem, homeNavItem, profileNavItem;
     private TextView calendarLabel, tasksLabel, homeLabel, profileLabel;
-    private NavBarHelper navBarHelper;
     private String email;
-    Button createContactBtn;
-    Dialog contactDialog;
+    private Button createContactBtn;
+    private Dialog contactDialog;
 
     interface OnContactCheckListener {
         void onCheck(boolean exists);
@@ -50,15 +51,12 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
     private void checkIfContactExists(String contactNumber, OnContactCheckListener callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("user_info")
                 .document(currentUserId)
                 .collection("contacts")
                 .whereEqualTo("number", contactNumber)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    callback.onCheck(!queryDocumentSnapshots.isEmpty());
-                })
+                .addOnSuccessListener(qs -> callback.onCheck(!qs.isEmpty()))
                 .addOnFailureListener(e -> {
                     Log.e("DEBUG_LOG", "Error checking contact: ", e);
                     callback.onCheck(false);
@@ -70,13 +68,9 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         db.collection("user_info")
                 .whereEqualTo("number", contactNumber)
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
-                        callback.onIdFetched(doc.getId());
-                    } else {
-                        callback.onIdFetched(null);
-                    }
+                .addOnSuccessListener(qs -> {
+                    if (!qs.isEmpty()) callback.onIdFetched(qs.getDocuments().get(0).getId());
+                    else callback.onIdFetched(null);
                 })
                 .addOnFailureListener(e -> {
                     Log.e("DEBUG_LOG", "Failed to fetch contact Doc ID: ", e);
@@ -90,29 +84,25 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main_dashboard);
 
+        // Initialize UI
         createContactBtn = findViewById(R.id.createContactBtn);
         contactDialog = new Dialog(this);
         contactDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         contactDialog.setContentView(R.layout.dialog_new_contact);
         contactDialog.setCancelable(false);
-
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(contactDialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         contactDialog.getWindow().setAttributes(lp);
-
         ImageButton closeButton = contactDialog.findViewById(R.id.closeButton);
         Button findContactButton = contactDialog.findViewById(R.id.findContactButton);
         TextInputEditText contactNameEditText = contactDialog.findViewById(R.id.contactNameEditText);
         TextInputEditText contactNumberEditText = contactDialog.findViewById(R.id.contactNumberEditText);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         findContactButton.setOnClickListener(v -> {
             String contactName = contactNameEditText.getText().toString().trim();
             String contactNumber = contactNumberEditText.getText().toString().trim();
-
             if (contactNumber.isEmpty()) {
                 contactNumberEditText.setError("Enter a valid number");
                 return;
@@ -126,49 +116,44 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                             Map<String, Object> contactData = new HashMap<>();
                             contactData.put("name", contactName);
                             contactData.put("number", contactNumber);
-
-                            db.collection("user_info")
+                            FirebaseFirestore.getInstance()
+                                    .collection("user_info")
                                     .document(currentUserId)
                                     .collection("contacts")
                                     .document(contactId)
                                     .set(contactData)
                                     .addOnSuccessListener(aVoid -> {
-                                        Log.d("DEBUG_LOG", "Contact added successfully with Doc ID.");
+                                        Log.d("DEBUG_LOG", "Contact added successfully.");
                                         fetchContactInfo();
                                         contactDialog.dismiss();
                                     })
-                                    .addOnFailureListener(e -> {
-                                        Log.e("DEBUG_LOG", "Failed to add contact with Doc ID: ", e);
-                                    });
-                        } else {
-                            Log.e("DEBUG_LOG", "Contact not found in user_info.");
+                                    .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to add contact: ", e));
                         }
                     });
                 }
             });
         });
-
         closeButton.setOnClickListener(v -> contactDialog.dismiss());
         createContactBtn.setOnClickListener(v -> contactDialog.show());
 
         contacts = new ArrayList<>();
         fetchContactInfo();
 
+        // Setup navigation
+        email = getIntent().getStringExtra("EMAIL");
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
             @Override
             public void onCalendarSelected() {
-                String email = getIntent().getStringExtra("EMAIL");
-                Intent intent = new Intent(main_dashboard.this, CalendarActivity.class);
-                intent.putExtra("EMAIL", email);
-                startActivity(intent);
+                Intent i = new Intent(main_dashboard.this, CalendarActivity.class);
+                i.putExtra("EMAIL", email);
+                startActivity(i);
             }
 
             @Override
             public void onTasksSelected() {
-                String email = getIntent().getStringExtra("EMAIL");
-                Intent intent = new Intent(main_dashboard.this, task_list.class);
-                intent.putExtra("EMAIL", email);
-                startActivity(intent);
+                Intent i = new Intent(main_dashboard.this, task_list.class);
+                i.putExtra("EMAIL", email);
+                startActivity(i);
             }
 
             @Override
@@ -178,7 +163,9 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
             @Override
             public void onProfileSelected() {
-                // TODO: Launch the Profile Activity
+                Intent i = new Intent(main_dashboard.this, ProfileActivity.class);
+                i.putExtra("EMAIL", email);
+                startActivity(i);
             }
 
             @Override
@@ -186,7 +173,6 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                 startActivity(new Intent(main_dashboard.this, codeActivity.class));
             }
         });
-
         homeNavItem = findViewById(R.id.homeNavItem);
         navBarHelper.selectTab(homeNavItem);
     }
@@ -197,61 +183,53 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         navBarHelper.selectTab(homeNavItem);
     }
 
-    void fetchContactInfo() {
+    private void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        email = getIntent().getStringExtra("EMAIL");
         contacts.clear();
-
         db.collection("user_info")
                 .whereEqualTo("email", email)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot userDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        currentUserId = userDoc.getId();
-                        db.collection("user_info")
-                                .document(currentUserId)
-                                .collection("contacts")
-                                .get()
-                                .addOnSuccessListener(querySnapshot -> {
-                                    for (DocumentSnapshot doc : querySnapshot) {
-                                        String name = doc.getString("name");
-                                        String number = doc.getString("number");
-                                        if (name == null || number == null) continue;
-                                        Contact newContact = new Contact(name, number, R.drawable.luffy);
-                                        newContact.setContactId(doc.getId());
-                                        contacts.add(newContact);
-                                    }
-                                    RecyclerView recycler_contact = findViewById(R.id.recycleContactList);
-                                    recycler_contact.setLayoutManager(new LinearLayoutManager(this));
-                                    recycler_contact.setAdapter(new ContactsAdapter(getApplicationContext(), contacts, this));
-                                })
-                                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to fetch contacts: ", e));
-                    } else {
-                        Log.d("DEBUG_LOG", "User not found in user_info.");
-                    }
+                .addOnSuccessListener(qs -> {
+                    if (qs.isEmpty()) return;
+                    currentUserId = qs.getDocuments().get(0).getId();
+                    db.collection("user_info")
+                            .document(currentUserId)
+                            .collection("contacts")
+                            .get()
+                            .addOnSuccessListener(qs2 -> {
+                                for (DocumentSnapshot doc : qs2) {
+                                    String name = doc.getString("name");
+                                    String number = doc.getString("number");
+                                    if (name == null || number == null) continue;
+                                    Contact c = new Contact(name, number, R.drawable.luffy);
+                                    c.setContactId(doc.getId());
+                                    contacts.add(c);
+                                }
+                                RecyclerView rv = findViewById(R.id.recycleContactList);
+                                rv.setLayoutManager(new LinearLayoutManager(this));
+                                rv.setAdapter(new ContactsAdapter(getApplicationContext(), contacts, this));
+                            });
                 })
-                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to fetch user: ", e));
+                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to fetch contacts: ", e));
     }
 
     @Override
     public void on_item_click(int position) {
         Intent intent = new Intent(main_dashboard.this, chatting.class);
-        intent.putExtra("name", contacts.get(position).getName());
-        intent.putExtra("image", contacts.get(position).getImage());
-        intent.putExtra("number", contacts.get(position).getNumber());
+        Contact c = contacts.get(position);
+        intent.putExtra("name", c.getName());
+        intent.putExtra("image", c.getImage());
+        intent.putExtra("number", c.getNumber());
         intent.putExtra("userID", currentUserId);
-        intent.putExtra("contactID", contacts.get(position).getContactId());
+        intent.putExtra("contactID", c.getContactId());
         startActivity(intent);
     }
 
     public static void navigateToHome(NavBarListener context) {
         if (context instanceof android.content.Context) {
-            Intent intent = new Intent((android.content.Context) context, main_dashboard.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            ((android.content.Context) context).startActivity(intent);
-        } else {
-            Log.e("DEBUG_LOG", "Context passed to navigateToHome is not an Android Context");
+            Intent i = new Intent((android.content.Context) context, main_dashboard.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            ((android.content.Context) context).startActivity(i);
         }
     }
 }
