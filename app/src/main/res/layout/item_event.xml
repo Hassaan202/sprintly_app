@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/event_item_background">
+
+    <TextView
+        android:id="@+id/eventTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/eventTimeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10:00 AM - 11:00 AM"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/eventDescriptionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event description goes here."
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/editEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Edit"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/mild_green"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+        <Button
+            android:id="@+id/deleteEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Delete"
+            android:textSize="12sp"
+            android:textColor="#FF5252"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+    </LinearLayout>
+</LinearLayout>
