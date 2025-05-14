@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class signup_page extends AppCompatActivity {
 
-    private TextInputEditText emailInput, passwordInput, confirmPasswordInput, nameInput, phoneInput;
+    private TextInputEditText emailInput, passwordInput, confirmPasswordInput, nameInput, numberInput;
     private Button signupButton;
 
     private FirebaseAuth auth;
@@ -46,7 +46,7 @@ public class signup_page extends AppCompatActivity {
         db   = FirebaseFirestore.getInstance();
 
         nameInput            = findViewById(R.id.nameInput);
-        phoneInput           = findViewById(R.id.phoneInput);
+        numberInput          = findViewById(R.id.phoneInput); // still uses phoneInput id
         emailInput           = findViewById(R.id.emailInput);
         passwordInput        = findViewById(R.id.passwordInput);
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
@@ -57,7 +57,7 @@ public class signup_page extends AppCompatActivity {
 
     private void validateAndCreateAccount() {
         String name    = nameInput.getText().toString().trim();
-        String phone   = phoneInput.getText().toString().trim();
+        String number  = numberInput.getText().toString().trim();
         String email   = emailInput.getText().toString().trim();
         String pwd     = passwordInput.getText().toString().trim();
         String confirm = confirmPasswordInput.getText().toString().trim();
@@ -67,9 +67,9 @@ public class signup_page extends AppCompatActivity {
             nameInput.requestFocus();
             return;
         }
-        if (phone.isEmpty() || !phone.matches("\\d{11}")) {
-            phoneInput.setError("Enter a valid 11-digit phone");
-            phoneInput.requestFocus();
+        if (number.isEmpty() || !number.matches("\\d{11}")) {
+            numberInput.setError("Enter a valid 11-digit number");
+            numberInput.requestFocus();
             return;
         }
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -100,20 +100,20 @@ public class signup_page extends AppCompatActivity {
                     // 2. Save extra details in Firestore
                     Map<String,Object> user = new HashMap<>();
                     user.put("name", name);
-                    user.put("phone", phone);
+                    user.put("number", number);
                     user.put("email", email);
                     user.put("password", pwd);
 
                     db.collection("user_info").document(uid)
                             .set(user)
                             .addOnSuccessListener(aVoid -> {
-                                // Optional: initialize empty contacts subcollection
+                                // initialize empty contacts subcollection
                                 db.collection("user_info").document(uid)
                                         .collection("contacts").add(new HashMap<>());
 
                                 pd.dismiss();
                                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                // Auto-login and go to dashboard
+                                // Redirect to login
                                 startActivity(new Intent(signup_page.this, login.class));
                                 finish();
                             })
