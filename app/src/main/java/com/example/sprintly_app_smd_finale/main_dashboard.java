@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.sprintly_app_smd_finale.ProfileActivity;
@@ -29,6 +31,7 @@ import java.util.Map;
 
 public class main_dashboard extends AppCompatActivity implements chat_interface {
 
+    private static final String TAG = "main_dashboard";
     List<Contact> contacts;
     private String currentUserId;
 
@@ -38,6 +41,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private String email;
     private Button createContactBtn;
     private Dialog contactDialog;
+    private FirebaseAuth mAuth;
 
     interface OnContactCheckListener {
         void onCheck(boolean exists);
@@ -56,24 +60,24 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                 .get()
                 .addOnSuccessListener(qs -> callback.onCheck(!qs.isEmpty()))
                 .addOnFailureListener(e -> {
-                    Log.e("DEBUG_LOG", "Error checking contact: ", e);
+                    Log.e(TAG, "Error checking contact: ", e);
                     callback.onCheck(false);
                 });
     }
 
     private void fetchContactDocId(String contactNumber, OnContactIdFetchListener callback) {
-        Log.d("DEBUG_LOG", "Entering the fetch contact id");
+        Log.d(TAG, "Entering the fetch contact id");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("user_info")
                 .whereEqualTo("number", contactNumber)
                 .get()
                 .addOnSuccessListener(qs -> {
-                    Log.d("DEBUG_LOG", "contact id is fetched");
+                    Log.d(TAG, "contact id is fetched");
                     if (!qs.isEmpty()) callback.onIdFetched(qs.getDocuments().get(0).getId());
                     else callback.onIdFetched(null);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("DEBUG_LOG", "Failed to fetch contact Doc ID: ", e);
+                    Log.e(TAG, "Failed to fetch contact Doc ID: ", e);
                     callback.onIdFetched(null);
                 });
     }
@@ -83,6 +87,9 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main_dashboard);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
         // Initialize UI
         createContactBtn = findViewById(R.id.createContactBtn);
@@ -101,7 +108,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         TextInputEditText contactNumberEditText = contactDialog.findViewById(R.id.contactNumberEditText);
 
         findContactButton.setOnClickListener(v -> {
-            Log.d("DEBUG_LOG", "find contact button is clicked");
+            Log.d(TAG, "find contact button is clicked");
             String contactName = contactNameEditText.getText().toString().trim();
             String contactNumber = contactNumberEditText.getText().toString().trim();
             if (contactNumber.isEmpty()) {
@@ -112,10 +119,10 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                 if (exists) {
                     contactNumberEditText.setError("Contact already exists!");
                 } else {
-                    Log.d("DEBUG_LOG", "about to enter the fetch contact function,this is the number:"+contactNumber);
+                    Log.d(TAG, "about to enter the fetch contact function,this is the number:"+contactNumber);
                     fetchContactDocId(contactNumber, contactId -> {
                         if (contactId != null) {
-                            Log.d("DEBUG_LOG", "addiong the contact");
+                            Log.d(TAG, "addiong the contact");
                             Map<String, Object> contactData = new HashMap<>();
                             contactData.put("name", contactName);
                             contactData.put("number", contactNumber);
@@ -126,19 +133,19 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                                     .document(contactId)
                                     .set(contactData)
                                     .addOnSuccessListener(aVoid -> {
-                                        Log.d("DEBUG_LOG", "Contact added successfully.");
+                                        Log.d(TAG, "Contact added successfully.");
                                         FirebaseFirestore.getInstance().collection("user_info")
                                                 .document(currentUserId)
                                                 .collection("contacts")
                                                 .document(contactId)
                                                 .collection("chats_info")
                                                 .add(new HashMap<>())
-                                                .addOnSuccessListener(docRef -> Log.d("DEBUG_LOG", "Chat Info initialized with auto ID: " + docRef.getId()))
-                                                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to create chat info: ", e));
+                                                .addOnSuccessListener(docRef -> Log.d(TAG, "Chat Info initialized with auto ID: " + docRef.getId()))
+                                                .addOnFailureListener(e -> Log.e(TAG, "Failed to create chat info: ", e));
                                         fetchContactInfo();
                                         contactDialog.dismiss();
                                     })
-                                    .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to add contact: ", e));
+                                    .addOnFailureListener(e -> Log.e(TAG, "Failed to add contact: ", e));
                         }
                     });
                 }
@@ -148,23 +155,19 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         createContactBtn.setOnClickListener(v -> contactDialog.show());
 
         contacts = new ArrayList<>();
-        email = getIntent().getStringExtra("EMAIL");
-        fetchContactInfo();
+        getUserEmailAndFetchData();
 
         // Setup navigation
-        email = getIntent().getStringExtra("EMAIL");
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
             @Override
             public void onCalendarSelected() {
                 Intent i = new Intent(main_dashboard.this, CalendarActivity.class);
-                i.putExtra("EMAIL", email);
                 startActivity(i);
             }
 
             @Override
             public void onTasksSelected() {
                 Intent i = new Intent(main_dashboard.this, task_list.class);
-                i.putExtra("EMAIL", email);
                 startActivity(i);
             }
 
@@ -176,7 +179,6 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
             @Override
             public void onProfileSelected() {
                 Intent i = new Intent(main_dashboard.this, ProfileActivity.class);
-                i.putExtra("EMAIL", email);
                 startActivity(i);
             }
 
@@ -195,15 +197,44 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         navBarHelper.selectTab(homeNavItem);
     }
 
+    private void getUserEmailAndFetchData() {
+        // Get current user from Firebase Authentication
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            // User is signed in
+            email = currentUser.getEmail();
+            Log.d(TAG, "User email from Firebase Auth: " + email);
+            fetchContactInfo();
+        } else {
+            // If Firebase Auth doesn't have a logged in user, check for email from intent (as fallback)
+            email = getIntent().getStringExtra("EMAIL");
+
+            if (email != null && !email.isEmpty()) {
+                Log.d(TAG, "User email from intent (fallback): " + email);
+                fetchContactInfo();
+            } else {
+                Log.e(TAG, "No user logged in and no email in intent");
+                // Redirect to login
+                Intent loginIntent = new Intent(main_dashboard.this, MainActivity.class);
+                startActivity(loginIntent);
+                finish();
+            }
+        }
+    }
+
     private void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         contacts.clear();
-        Log.d("DEBUG_LOG", "Current User email: " + email);
+        Log.d(TAG, "Fetching contacts for email: " + email);
         db.collection("user_info")
                 .whereEqualTo("email", email)
                 .get()
                 .addOnSuccessListener(qs -> {
-                    if (qs.isEmpty()) return;
+                    if (qs.isEmpty()) {
+                        Log.e(TAG, "No user found with email: " + email);
+                        return;
+                    }
                     currentUserId = qs.getDocuments().get(0).getId();
                     db.collection("user_info")
                             .document(currentUserId)
@@ -221,9 +252,10 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                                 RecyclerView rv = findViewById(R.id.recycleContactList);
                                 rv.setLayoutManager(new LinearLayoutManager(this));
                                 rv.setAdapter(new ContactsAdapter(getApplicationContext(), contacts, this));
-                            });
+                            })
+                            .addOnFailureListener(e -> Log.e(TAG, "Failed to fetch contact list: ", e));
                 })
-                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to fetch contacts: ", e));
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to fetch user: ", e));
     }
 
     @Override
