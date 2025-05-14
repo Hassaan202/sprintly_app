@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -47,7 +49,9 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
     private LinearLayout calendarNavItem;
 
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
     private String currentUserId;
+    private String userEmail;
     private String currentDateStr; // yyyy-MM-dd
 
     private List<CalendarEvent> eventsList;
@@ -64,18 +68,11 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
         setContentView(R.layout.calendar_dashboard);
 
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         initializeUI();
         setupNavigation();
-
-        String email = getIntent().getStringExtra("EMAIL");
-        if (email != null) {
-            fetchUserIdFromEmail(email);
-        } else {
-            Log.e(TAG, "No email provided in intent");
-            Toast.makeText(this, "Error: User information not available", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        getUserFromFirebase();
 
         Calendar today = Calendar.getInstance();
         currentDateStr = dateFormatter.format(today.getTime());
@@ -85,6 +82,12 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         eventAdapter = new EventAdapter(this, eventsList, this);
         eventRecyclerView.setAdapter(eventAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navBarHelper.selectTab(calendarNavItem);
     }
 
     private void initializeUI() {
@@ -106,25 +109,43 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
 
     private void setupNavigation() {
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
-            @Override public void onCalendarSelected() {}
+            @Override public void onCalendarSelected() {
+                // nothing here
+            }
             @Override public void onTasksSelected() {
                 Intent intent = new Intent(CalendarActivity.this, task_list.class);
-                intent.putExtra("EMAIL", getIntent().getStringExtra("EMAIL"));
                 startActivity(intent);
             }
             @Override public void onHomeSelected() {
                 Intent intent = new Intent(CalendarActivity.this, main_dashboard.class);
-                intent.putExtra("EMAIL", getIntent().getStringExtra("EMAIL"));
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
-            @Override public void onProfileSelected() {}
+            @Override public void onProfileSelected() {
+                startActivity(new Intent(CalendarActivity.this, ProfileActivity.class));
+            }
             @Override public void onCodeSelected() {
                 startActivity(new Intent(CalendarActivity.this, codeActivity.class));
             }
         });
         calendarNavItem = findViewById(R.id.calendarNavItem);
         navBarHelper.selectTab(calendarNavItem);
+    }
+
+    private void getUserFromFirebase() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            userEmail = currentUser.getEmail();
+            fetchUserIdFromEmail(userEmail);
+        } else {
+            Log.e(TAG, "No user is currently signed in");
+            Toast.makeText(this, "Error: Please sign in again", Toast.LENGTH_SHORT).show();
+            // Redirect to login
+            Intent intent = new Intent(CalendarActivity.this, login.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void fetchUserIdFromEmail(String email) {

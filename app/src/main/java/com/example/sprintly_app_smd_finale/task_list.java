@@ -162,7 +162,6 @@ public class task_list extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_task_list);
-//getting the email
 
         // SETTING UP THE RECYCLER VIEW
         rvTasks = findViewById(R.id.rvTasks);
@@ -172,18 +171,17 @@ public class task_list extends AppCompatActivity {
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
             @Override
             public void onCalendarSelected() {
-                // TODO: launch Calender activity
+                startActivity(new Intent(task_list.this, CalendarActivity.class));
             }
 
             @Override
             public void onTasksSelected() {
-                // TODO: no action here
-
+                // nothing here
             }
 
             @Override
             public void onHomeSelected() {
-                 String email = getIntent().getStringExtra("EMAIL");
+                String email = getIntent().getStringExtra("EMAIL");
                 Intent intent = new Intent(task_list.this, main_dashboard.class);
                 intent.putExtra("EMAIL", email);
                 startActivity(intent);
@@ -191,7 +189,7 @@ public class task_list extends AppCompatActivity {
 
             @Override
             public void onProfileSelected() {
-                // TODO: launch Calender activity
+                startActivity(new Intent(task_list.this, ProfileActivity.class));
 
             }
 

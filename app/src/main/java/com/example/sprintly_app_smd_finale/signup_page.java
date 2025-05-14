@@ -14,23 +14,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class signup_page extends AppCompatActivity {
 
-    // UI Elements
-    private TextInputEditText emailInput;
-    private TextInputEditText passwordInput;
-    private TextInputEditText confirmPasswordInput;
-    private TextInputEditText nameInput;
-    private TextInputEditText phoneInput;
+    private TextInputEditText emailInput, passwordInput, confirmPasswordInput, nameInput, numberInput;
     private Button signupButton;
 
-    // Firebase references
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
@@ -41,140 +39,103 @@ public class signup_page extends AppCompatActivity {
         setContentView(R.layout.activity_signup_page);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return insets;
         });
 
-        // Initialize Firebase
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        db   = FirebaseFirestore.getInstance();
 
-        // Initialize UI
-        initializeUI();
-    }
-
-    private void initializeUI() {
-        nameInput = findViewById(R.id.nameInput);
-        phoneInput = findViewById(R.id.phoneInput);
-        emailInput = findViewById(R.id.emailInput);
-        passwordInput = findViewById(R.id.passwordInput);
+        nameInput            = findViewById(R.id.nameInput);
+        numberInput          = findViewById(R.id.phoneInput); // still uses phoneInput id
+        emailInput           = findViewById(R.id.emailInput);
+        passwordInput        = findViewById(R.id.passwordInput);
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
-        signupButton = findViewById(R.id.signupButton);
+        signupButton         = findViewById(R.id.signupButton);
 
         signupButton.setOnClickListener(v -> validateAndCreateAccount());
     }
 
     private void validateAndCreateAccount() {
-        String name = nameInput.getText().toString().trim();
-        String phone = phoneInput.getText().toString().trim();
-        String email = emailInput.getText().toString().trim();
-        String password = passwordInput.getText().toString().trim();
-        String confirmPassword = confirmPasswordInput.getText().toString().trim();
+        String name    = nameInput.getText().toString().trim();
+        String number  = numberInput.getText().toString().trim();
+        String email   = emailInput.getText().toString().trim();
+        String pwd     = passwordInput.getText().toString().trim();
+        String confirm = confirmPasswordInput.getText().toString().trim();
 
-        if (!validateInputs(name, phone, email, password, confirmPassword)) return;
-
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Creating account...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
-        db.collection("user_info")
-                .whereEqualTo("email", email)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        if (!task.getResult().isEmpty()) {
-                            progressDialog.dismiss();
-                            Toast.makeText(signup_page.this, "Email already exists", Toast.LENGTH_SHORT).show();
-                        } else {
-                            createUserInFirestore(name, phone, email, password, progressDialog);
-                        }
-                    } else {
-                        progressDialog.dismiss();
-                        Toast.makeText(signup_page.this, "Error checking email: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private boolean validateInputs(String name, String phone, String email, String password, String confirmPassword) {
         if (name.isEmpty()) {
             nameInput.setError("Name is required");
             nameInput.requestFocus();
-            return false;
+            return;
         }
-        if (phone.isEmpty()) {
-            phoneInput.setError("Phone number is required");
-            phoneInput.requestFocus();
-            return false;
+        if (number.isEmpty() || !number.matches("\\d{11}")) {
+            numberInput.setError("Enter a valid 11-digit number");
+            numberInput.requestFocus();
+            return;
         }
-        if (!phone.matches("\\d{11}")) {
-            phoneInput.setError("Enter a valid 11-digit number");
-            phoneInput.requestFocus();
-            return false;
-        }
-        if (email.isEmpty()) {
-            emailInput.setError("Email is required");
+        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInput.setError("Valid email is required");
             emailInput.requestFocus();
-            return false;
+            return;
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Please enter a valid email");
-            emailInput.requestFocus();
-            return false;
-        }
-        if (password.isEmpty()) {
-            passwordInput.setError("Password is required");
+        if (pwd.isEmpty() || pwd.length() < 6) {
+            passwordInput.setError("Password >= 6 chars");
             passwordInput.requestFocus();
-            return false;
+            return;
         }
-        if (password.length() < 6) {
-            passwordInput.setError("Password must be at least 6 characters");
-            passwordInput.requestFocus();
-            return false;
-        }
-        if (!password.equals(confirmPassword)) {
+        if (!pwd.equals(confirm)) {
             confirmPasswordInput.setError("Passwords do not match");
             confirmPasswordInput.requestFocus();
-            return false;
+            return;
         }
-        return true;
-    }
 
-    private void createUserInFirestore(String name, String phone, String email, String password, ProgressDialog progressDialog) {
-        Map<String, Object> user = new HashMap<>();
-        user.put("name", name);
-        user.put("phone", phone);
-        user.put("email", email);
-        user.put("password", password);
+        ProgressDialog pd = new ProgressDialog(this);
+        pd.setMessage("Creating account...");
+        pd.setCancelable(false);
+        pd.show();
 
-        db.collection("user_info")
-                .add(user)
-                .addOnSuccessListener(documentReference -> {
-                    String newUserId = documentReference.getId();
+        // 1. Create user in FirebaseAuth
+        auth.createUserWithEmailAndPassword(email, pwd)
+                .addOnSuccessListener((AuthResult authResult) -> {
+                    String uid = authResult.getUser().getUid();
+                    // 2. Save extra details in Firestore
+                    Map<String,Object> user = new HashMap<>();
+                    user.put("name", name);
+                    user.put("number", number);
+                    user.put("email", email);
+                    user.put("password", pwd);
 
-                    Map<String, Object> initialContact = new HashMap<>();
-                    initialContact.put("name", null);
-                    initialContact.put("number", null);
+                    db.collection("user_info").document(uid)
+                            .set(user)
+                            .addOnSuccessListener(aVoid -> {
+                                // initialize empty contacts subcollection
+                                db.collection("user_info").document(uid)
+                                        .collection("contacts").add(new HashMap<>());
 
-                    db.collection("user_info")
-                            .document(newUserId)
-                            .collection("contacts")
-                            .add(initialContact)
-                            .addOnSuccessListener(unused -> {
-                                progressDialog.dismiss();
-                                Toast.makeText(signup_page.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                pd.dismiss();
+                                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                // init zego cloud
+                                ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+                                ZegoUIKitPrebuiltCallService.init(getApplication(), AppConstants.APP_ID, AppConstants.APP_SIGN, uid, name, callInvitationConfig);
+
+                                // Redirect to login
                                 startActivity(new Intent(signup_page.this, login.class));
                                 finish();
                             })
                             .addOnFailureListener(e -> {
-                                progressDialog.dismiss();
-                                Toast.makeText(signup_page.this, "Error creating initial contact: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                pd.dismiss();
+                                Toast.makeText(this, "Error saving user data: " + e.getMessage(), Toast.LENGTH_LONG).show();
                             });
                 })
                 .addOnFailureListener(e -> {
-                    progressDialog.dismiss();
-                    Toast.makeText(signup_page.this, "Error creating account: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    pd.dismiss();
+                    if (e instanceof FirebaseAuthUserCollisionException) {
+                        emailInput.setError("Email already registered");
+                        emailInput.requestFocus();
+                    } else {
+                        Toast.makeText(this, "Signup failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 });
     }
 }

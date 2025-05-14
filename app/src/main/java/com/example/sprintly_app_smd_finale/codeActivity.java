@@ -64,7 +64,7 @@ public class codeActivity extends AppCompatActivity {
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
             @Override
             public void onCalendarSelected() {
-                // TODO: Launch the Calendar Activity
+                startActivity(new Intent(codeActivity.this, CalendarActivity.class));
             }
 
             @Override
@@ -79,7 +79,7 @@ public class codeActivity extends AppCompatActivity {
 
             @Override
             public void onProfileSelected() {
-                // TODO: Launch the Profile Activity
+                startActivity(new Intent(codeActivity.this, ProfileActivity.class));
             }
 
             @Override
