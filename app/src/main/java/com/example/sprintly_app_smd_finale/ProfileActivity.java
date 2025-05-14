@@ -1,8 +1,10 @@
 package com.example.sprintly_app_smd_finale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,10 +22,12 @@ public class ProfileActivity extends AppCompatActivity {
     private TextInputEditText nameInput, emailInput, phoneInput;
     private TextInputEditText currentPwInput, newPwInput, confirmPwInput;
     private Button saveBtn;
+    private NavBarHelper navBarHelper;
 
     private FirebaseFirestore db;
     private String currentUserId, email;
     private String storedPassword;
+    private LinearLayout profileNavItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,46 @@ public class ProfileActivity extends AppCompatActivity {
                 });
 
         saveBtn.setOnClickListener(v -> saveProfile());
+
+
+        profileNavItem = findViewById(R.id.profileNavItem);
+        // Setup navigation
+        navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
+            @Override
+            public void onCalendarSelected() {
+                Intent i = new Intent(ProfileActivity.this, CalendarActivity.class);
+                startActivity(i);
+            }
+
+            @Override
+            public void onTasksSelected() {
+                Intent i = new Intent(ProfileActivity.this, task_list.class);
+                startActivity(i);
+            }
+
+            @Override
+            public void onHomeSelected() {
+                startActivity(new Intent(ProfileActivity.this, main_dashboard.class));
+            }
+
+            @Override
+            public void onProfileSelected() {
+                // nothing here
+            }
+
+            @Override
+            public void onCodeSelected() {
+                startActivity(new Intent(ProfileActivity.this, codeActivity.class));
+            }
+        });
+        profileNavItem = findViewById(R.id.homeNavItem);
+        navBarHelper.selectTab(profileNavItem);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navBarHelper.selectTab(profileNavItem);
     }
 
     private void loadProfile(DocumentSnapshot doc) {

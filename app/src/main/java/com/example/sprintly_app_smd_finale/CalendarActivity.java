@@ -87,6 +87,12 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
         eventRecyclerView.setAdapter(eventAdapter);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        navBarHelper.selectTab(calendarNavItem);
+    }
+
     private void initializeUI() {
         calendarView = findViewById(R.id.calendarView);
         selectedDateText = findViewById(R.id.selectedDateText);
@@ -106,7 +112,9 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
 
     private void setupNavigation() {
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
-            @Override public void onCalendarSelected() {}
+            @Override public void onCalendarSelected() {
+                // nothing here
+            }
             @Override public void onTasksSelected() {
                 Intent intent = new Intent(CalendarActivity.this, task_list.class);
                 intent.putExtra("EMAIL", getIntent().getStringExtra("EMAIL"));
@@ -118,7 +126,9 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
-            @Override public void onProfileSelected() {}
+            @Override public void onProfileSelected() {
+                startActivity(new Intent(CalendarActivity.this, ProfileActivity.class));
+            }
             @Override public void onCodeSelected() {
                 startActivity(new Intent(CalendarActivity.this, codeActivity.class));
             }

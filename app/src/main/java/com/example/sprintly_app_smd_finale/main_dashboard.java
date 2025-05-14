@@ -31,12 +31,10 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
     List<Contact> contacts;
     private String currentUserId;
-    private String selectedContactId;
 
     // Navigation items
     private NavBarHelper navBarHelper;
-    private LinearLayout calendarNavItem, tasksNavItem, homeNavItem, profileNavItem;
-    private TextView calendarLabel, tasksLabel, homeLabel, profileLabel;
+    private LinearLayout homeNavItem;
     private String email;
     private Button createContactBtn;
     private Dialog contactDialog;
