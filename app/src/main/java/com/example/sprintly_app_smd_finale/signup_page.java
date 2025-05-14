@@ -18,6 +18,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -113,6 +115,10 @@ public class signup_page extends AppCompatActivity {
 
                                 pd.dismiss();
                                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                // init zego cloud
+                                ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+                                ZegoUIKitPrebuiltCallService.init(getApplication(), AppConstants.APP_ID, AppConstants.APP_SIGN, uid, name, callInvitationConfig);
+
                                 // Redirect to login
                                 startActivity(new Intent(signup_page.this, login.class));
                                 finish();

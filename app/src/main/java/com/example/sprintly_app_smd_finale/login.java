@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 public class login extends AppCompatActivity {
 
@@ -64,9 +67,34 @@ public class login extends AppCompatActivity {
                 .addOnSuccessListener(authResult -> {
                     pd.dismiss();
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                    // Launch main_dashboard
-                    startActivity(new Intent(login.this, main_dashboard.class));
-                    finish();
+                    String uid = mAuth.getCurrentUser().getUid();
+
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("user_info").document(uid).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    String name = documentSnapshot.getString("name");
+
+                                    ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+                                    ZegoUIKitPrebuiltCallService.init(
+                                            getApplication(),
+                                            AppConstants.APP_ID,
+                                            AppConstants.APP_SIGN,
+                                            uid,
+                                            name != null ? name : "Unknown",
+                                            callInvitationConfig
+                                    );
+
+                                    startActivity(new Intent(login.this, main_dashboard.class));
+                                    finish();
+                                } else {
+                                    Toast.makeText(this, "User data not found", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Failed to fetch user name", Toast.LENGTH_SHORT).show();
+                            });
+
                 })
                 .addOnFailureListener(e -> {
                     pd.dismiss();
