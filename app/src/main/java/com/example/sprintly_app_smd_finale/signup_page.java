@@ -114,7 +114,7 @@ public class signup_page extends AppCompatActivity {
                                 pd.dismiss();
                                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
                                 // Auto-login and go to dashboard
-                                startActivity(new Intent(signup_page.this, main_dashboard.class));
+                                startActivity(new Intent(signup_page.this, login.class));
                                 finish();
                             })
                             .addOnFailureListener(e -> {
