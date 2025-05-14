@@ -64,11 +64,13 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     }
 
     private void fetchContactDocId(String contactNumber, OnContactIdFetchListener callback) {
+        Log.d("DEBUG_LOG", "Entering the fetch contact id");
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("user_info")
                 .whereEqualTo("number", contactNumber)
                 .get()
                 .addOnSuccessListener(qs -> {
+                    Log.d("DEBUG_LOG", "contact id is fetched");
                     if (!qs.isEmpty()) callback.onIdFetched(qs.getDocuments().get(0).getId());
                     else callback.onIdFetched(null);
                 })
@@ -101,6 +103,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         TextInputEditText contactNumberEditText = contactDialog.findViewById(R.id.contactNumberEditText);
 
         findContactButton.setOnClickListener(v -> {
+            Log.d("DEBUG_LOG", "find contact button is clicked");
             String contactName = contactNameEditText.getText().toString().trim();
             String contactNumber = contactNumberEditText.getText().toString().trim();
             if (contactNumber.isEmpty()) {
@@ -111,8 +114,10 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                 if (exists) {
                     contactNumberEditText.setError("Contact already exists!");
                 } else {
+                    Log.d("DEBUG_LOG", "about to enter the fetch contact function,this is the number:"+contactNumber);
                     fetchContactDocId(contactNumber, contactId -> {
                         if (contactId != null) {
+                            Log.d("DEBUG_LOG", "addiong the contact");
                             Map<String, Object> contactData = new HashMap<>();
                             contactData.put("name", contactName);
                             contactData.put("number", contactNumber);
@@ -124,6 +129,14 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                                     .set(contactData)
                                     .addOnSuccessListener(aVoid -> {
                                         Log.d("DEBUG_LOG", "Contact added successfully.");
+                                        FirebaseFirestore.getInstance().collection("user_info")
+                                                .document(currentUserId)
+                                                .collection("contacts")
+                                                .document(contactId)
+                                                .collection("chats_info")
+                                                .add(new HashMap<>())
+                                                .addOnSuccessListener(docRef -> Log.d("DEBUG_LOG", "Chat Info initialized with auto ID: " + docRef.getId()))
+                                                .addOnFailureListener(e -> Log.e("DEBUG_LOG", "Failed to create chat info: ", e));
                                         fetchContactInfo();
                                         contactDialog.dismiss();
                                     })
@@ -137,6 +150,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
         createContactBtn.setOnClickListener(v -> contactDialog.show());
 
         contacts = new ArrayList<>();
+        email = getIntent().getStringExtra("EMAIL");
         fetchContactInfo();
 
         // Setup navigation
@@ -186,6 +200,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         contacts.clear();
+        Log.d("DEBUG_LOG", "Current User email: " + email);
         db.collection("user_info")
                 .whereEqualTo("email", email)
                 .get()
