@@ -4,49 +4,64 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="8dp"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:backgroundTint="#49E655">
 
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp"
-        android:background="@drawable/task_item_background">
+        android:padding="16dp"
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Task Title"
             android:textSize="18sp"
+            android:textColor="#212121"
             android:textStyle="bold"
-            android:text="Title"/>
+            android:lineSpacingExtra="4dp"/>
 
         <TextView
             android:id="@+id/tvAssignee"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Assignee"/>
+            android:text="Assigned to: John Doe"
+            android:textSize="14sp"
+            android:textColor="#616161"
+            android:layout_marginTop="4dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="8dp">
 
             <TextView
                 android:id="@+id/tvDueDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Due: 2025-05-20"
+                android:textSize="14sp"
+                android:textColor="#757575"/>
+
+            <TextView
+                android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Due: YYYY-MM-DD"/>
+                android:text="In Progress"
+                android:textSize="14sp"
+                android:textColor="#388E3C"
+                android:textStyle="bold"/>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Status"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

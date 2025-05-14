@@ -18,12 +18,11 @@ import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 
 public class login extends AppCompatActivity {
-
     private TextInputEditText emailInput, passwordInput;
     private Button loginButton;
     private TextView signUpLink;
-
     private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

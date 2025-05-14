@@ -21,8 +21,9 @@ public class codeActivity extends AppCompatActivity {
     private ImageButton sendButton;
     private List<Message> messageList;
     private codeAdapter codeAdapter;
-    private GeminiHelper geminiHelper;
-    String apiKey = "AIzaSyCliqQr0kg2HDPv-KVMseHjtPU0F1n95xE";
+    private OpenAIHelper openAIHelper;
+    String apiKey = "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"; // Replace with your actual OpenAI API key
+    String model = "gpt-4.1-nano"; // cheapest model for free usage
 
     // Navigation items
     private LinearLayout codeNavItem;
@@ -56,8 +57,8 @@ public class codeActivity extends AppCompatActivity {
         // Setup navigation bar
         setupNavbar();
 
-        // Set up Gemini
-        geminiHelper = new GeminiHelper("gemini-flash", apiKey);
+        // Set up OpenAI
+        openAIHelper = new OpenAIHelper(apiKey, model);
     }
 
     private void setupNavbar() {
@@ -110,11 +111,10 @@ public class codeActivity extends AppCompatActivity {
         // Clear input field
         codeInputEditText.setText("");
 
-        // Get response from Gemini
-        geminiHelper.askCodingQuestion(message, (response, codeBlock) -> {
+        // Get response from OpenAI
+        openAIHelper.askCodingQuestion(message, (response, codeBlock) -> {
             // Add bot response to chat
             addBotMessage(response, codeBlock);
-
             // Scroll to the bottom of the chat
             chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
         });

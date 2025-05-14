@@ -7,28 +7,40 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNav"
-        android:padding="16dp">
+        android:layout_above="@+id/bottomNav">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/profileTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your Profile"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            <!-- Sticky Header -->
+            <LinearLayout
+                android:id="@+id/stickyHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/mild_green"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/profileTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Profile"
+                    android:textSize="24sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
         <!-- Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name">
+            android:hint="Name"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameInput"
@@ -41,7 +53,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/emailInput"
@@ -55,7 +68,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Phone"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/phoneInput"
@@ -69,13 +83,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Current Password"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/currentPasswordInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:paddingHorizontal="16dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- New Password -->
@@ -83,7 +99,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="New Password"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/newPasswordInput"
@@ -97,7 +114,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Confirm Password"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/confirmPasswordInput"
@@ -109,11 +127,14 @@
         <!-- Save Button -->
         <Button
             android:id="@+id/saveProfileBtn"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save Changes"
             android:layout_marginTop="32dp"
-            android:backgroundTint="@color/mild_green" />
+            android:backgroundTint="@color/mild_green"
+            android:layout_gravity="center"
+            android:paddingHorizontal="50dp"
+            />
         </LinearLayout>
     </ScrollView>
 

@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -251,7 +252,7 @@ public class task_list extends AppCompatActivity {
         rvTasks.setAdapter(adapter);
 
         //ADDING THE MECHANISM TO ADD NEW TASKS TO THE LIST
-        Button btnAddTask = findViewById(R.id.btnAddTask);
+        FloatingActionButton btnAddTask = findViewById(R.id.btnAddTask);
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

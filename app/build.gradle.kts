@@ -31,6 +31,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    // Add packaging options to resolve META-INF conflicts
+    packaging {
+        resources {
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/license.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+            excludes += "/META-INF/notice.txt"
+            excludes += "/META-INF/ASL2.0"
+            excludes += "/META-INF/*.kotlin_module"
+        }
+    }
 }
 
 dependencies {
@@ -66,5 +81,8 @@ dependencies {
 
     // Gemini
     implementation ("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // OpenAI Java client library
+    implementation("com.openai:openai-java:1.6.1")
 }
 
