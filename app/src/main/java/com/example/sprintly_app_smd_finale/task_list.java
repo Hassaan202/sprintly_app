@@ -9,6 +9,8 @@ import androidx.appcompat.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,7 +27,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -80,17 +84,28 @@ public class task_list extends AppCompatActivity {
         }
     };
 
-
+    private final String[] STATUS_OPTIONS = {
+            "Done", "In Progress", "Not Started"
+    };
     private void showAddTaskDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle("Add New Task");
 
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_task, null);
         builder.setView(dialogView);
 
-        EditText etTitle = dialogView.findViewById(R.id.etTitle);
-        EditText etDueDate = dialogView.findViewById(R.id.etDueDate);
-        EditText etStatus = dialogView.findViewById(R.id.etStatus);
+        TextInputEditText etTitle = dialogView.findViewById(R.id.etTitle);
+        TextInputEditText etDueDate = dialogView.findViewById(R.id.etDueDate);
+        AutoCompleteTextView etStatus = dialogView.findViewById(R.id.etStatus);
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                STATUS_OPTIONS
+        );
+        etStatus.setAdapter(statusAdapter);
+
+        etStatus.setText(STATUS_OPTIONS[2], false); // default "Not Started"
 
         etDueDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,7 +255,6 @@ public class task_list extends AppCompatActivity {
                     .addOnSuccessListener(documentSnapshot ->
                             userName = Objects.requireNonNull(documentSnapshot.get("name")).toString() );
         }
-
 
         adapter = new TaskListAdapter(taskList, actionModeCallback, actionMode,this);
         adapter.setOnItemClickListener(new TaskListAdapter.OnItemClickListener() {

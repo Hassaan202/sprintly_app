@@ -22,7 +22,7 @@ public class codeActivity extends AppCompatActivity {
     private List<Message> messageList;
     private codeAdapter codeAdapter;
     private OpenAIHelper openAIHelper;
-    String apiKey = "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"; // Replace with your actual OpenAI API key
+    String apiKey = "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";
     String model = "gpt-4.1-nano"; // cheapest model for free usage
 
     // Navigation items
