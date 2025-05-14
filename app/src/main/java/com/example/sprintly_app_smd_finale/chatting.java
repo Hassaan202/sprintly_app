@@ -1,5 +1,6 @@
 package com.example.sprintly_app_smd_finale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -37,6 +38,7 @@ public class chatting extends AppCompatActivity {
     ChatAdapter chatAdapter;
     private EditText messageInput;
     private ImageView sendButton;
+    private ImageView backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class chatting extends AppCompatActivity {
         profileImageView = findViewById(R.id.profileImage);
         nameTextView = findViewById(R.id.profileName);
         chatRecyclerView = findViewById(R.id.recyclerChat);
+
 
         // Intent
         userId = getIntent().getStringExtra("userID");
@@ -80,8 +83,15 @@ public class chatting extends AppCompatActivity {
         fetchChatMessages();
         messageInput = findViewById(R.id.messageInput);
         sendButton = findViewById(R.id.sendButton);
-
+        backButton=findViewById(R.id.backButton);
         sendButton.setOnClickListener(v -> sendMessage());
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(chatting.this, main_dashboard.class);
+            startActivity(intent);
+            finish(); // Optional: Closes the current activity
+        });
+
+
     }
 
     private void sendMessage() {

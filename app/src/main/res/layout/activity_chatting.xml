@@ -22,6 +22,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/back_arrow"
+                android:clickable="true"
+                android:focusable="true"
                 android:contentDescription="Back" />
 
             <!-- ✅ Profile Image with ID -->

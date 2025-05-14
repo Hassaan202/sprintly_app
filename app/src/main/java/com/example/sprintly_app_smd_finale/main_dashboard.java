@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +43,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private Button createContactBtn;
     private Dialog contactDialog;
     private FirebaseAuth mAuth;
+    private TextView user_name_view;
 
     interface OnContactCheckListener {
         void onCheck(boolean exists);
@@ -90,6 +92,33 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        //initialize the user name in the dashboard
+        user_name_view=findViewById(R.id.usernameText);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            email = currentUser.getEmail();
+        }
+        FirebaseFirestore db_name=FirebaseFirestore.getInstance();
+        db_name.collection("user_info")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener(qs -> {
+                    if (qs.isEmpty()) {
+                        Toast.makeText(this, "User record not found", Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
+                    DocumentSnapshot doc = qs.getDocuments().get(0);
+                    String userName = doc.getString("name"); // Assuming the field name is "name"
+                    user_name_view.setText(userName); // Setting the name in TextView
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching user", e);
+                    Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+
 
         // Initialize UI
         createContactBtn = findViewById(R.id.createContactBtn);
