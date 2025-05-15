@@ -173,7 +173,7 @@ public class CalendarActivity extends AppCompatActivity implements EventAdapter.
 
     private void fetchEventsForDate(String dateStr) {
         if (currentUserId == null) return;
-
+        Log.d(TAG, "fetching the events");
         db.collection("user_info")
                 .document(currentUserId)
                 .collection("calendar_events")

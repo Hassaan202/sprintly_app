@@ -3,10 +3,13 @@ package com.example.sprintly_app_smd_finale;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,6 +38,7 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private static final String TAG = "main_dashboard";
     List<Contact> contacts;
     private String currentUserId;
+    private EditText searchContact;
 
     // Navigation items
     private NavBarHelper navBarHelper;
@@ -44,6 +48,8 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     private Dialog contactDialog;
     private FirebaseAuth mAuth;
     private TextView user_name_view;
+    // **Task Visualization Instance**
+    private TaskVisualization taskVisualization;
 
     interface OnContactCheckListener {
         void onCheck(boolean exists);
@@ -92,9 +98,24 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        searchContact = findViewById(R.id.searchContact);  //Search contact
+
+        searchContact.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterContacts(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         //initialize the user name in the dashboard
         user_name_view=findViewById(R.id.usernameText);
+        taskVisualization = findViewById(R.id.taskVisualization_); // Initialize the chart
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             email = currentUser.getEmail();
@@ -112,6 +133,9 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
                     DocumentSnapshot doc = qs.getDocuments().get(0);
                     String userName = doc.getString("name"); // Assuming the field name is "name"
                     user_name_view.setText(userName); // Setting the name in TextView
+                    if (taskVisualization != null) {
+                        taskVisualization.fetchDataFromFirestore();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error fetching user", e);
@@ -224,6 +248,9 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
     protected void onResume() {
         super.onResume();
         navBarHelper.selectTab(homeNavItem);
+        if (taskVisualization != null) {
+            taskVisualization.fetchDataFromFirestore();
+        }
     }
 
     private void getUserEmailAndFetchData() {
@@ -251,6 +278,17 @@ public class main_dashboard extends AppCompatActivity implements chat_interface 
             }
         }
     }
+    private void filterContacts(String query) {
+        List<Contact> filteredList = new ArrayList<>();
+        for (Contact contact : contacts) {
+            if (contact.getName().toLowerCase().contains(query.toLowerCase()) ||
+                    contact.getNumber().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(contact);
+            }
+        }
+        ContactsAdapter.updateList(filteredList);
+    }
+
 
     private void fetchContactInfo() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

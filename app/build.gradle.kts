@@ -84,5 +84,7 @@ dependencies {
 
     // OpenAI Java client library
     implementation("com.openai:openai-java:1.6.1")
+    //Pie chart library
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
 
