@@ -21,7 +21,7 @@ import java.util.Map;
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
 
-    private TextInputEditText nameInput, emailInput, phoneInput;
+    private TextInputEditText nameInput, emailInput, numberInput;
     private TextInputEditText currentPwInput, newPwInput, confirmPwInput;
     private Button saveBtn;
     private NavBarHelper navBarHelper;
@@ -43,7 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         nameInput      = findViewById(R.id.nameInput);
         emailInput     = findViewById(R.id.emailInput);
-        phoneInput     = findViewById(R.id.phoneInput);
+        numberInput    = findViewById(R.id.numberInput);
         currentPwInput = findViewById(R.id.currentPasswordInput);
         newPwInput     = findViewById(R.id.newPasswordInput);
         confirmPwInput = findViewById(R.id.confirmPasswordInput);
@@ -82,7 +82,6 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "No user is currently signed in");
             Toast.makeText(this, "Error: Please sign in again", Toast.LENGTH_SHORT).show();
-            // Redirect to login
             Intent intent = new Intent(ProfileActivity.this, login.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
@@ -92,30 +91,21 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupNavigation() {
         profileNavItem = findViewById(R.id.profileNavItem);
-        // Setup navigation
         navBarHelper = new NavBarHelper(findViewById(android.R.id.content), new NavBarListener() {
             @Override
             public void onCalendarSelected() {
-                Intent i = new Intent(ProfileActivity.this, CalendarActivity.class);
-                startActivity(i);
+                startActivity(new Intent(ProfileActivity.this, CalendarActivity.class));
             }
-
             @Override
             public void onTasksSelected() {
-                Intent i = new Intent(ProfileActivity.this, task_list.class);
-                startActivity(i);
+                startActivity(new Intent(ProfileActivity.this, task_list.class));
             }
-
             @Override
             public void onHomeSelected() {
                 startActivity(new Intent(ProfileActivity.this, main_dashboard.class));
             }
-
             @Override
-            public void onProfileSelected() {
-                // nothing here
-            }
-
+            public void onProfileSelected() { /* no-op */ }
             @Override
             public void onCodeSelected() {
                 startActivity(new Intent(ProfileActivity.this, codeActivity.class));
@@ -133,29 +123,29 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadProfile(DocumentSnapshot doc) {
         nameInput.setText(doc.getString("name"));
         emailInput.setText(userEmail);
-        phoneInput.setText(doc.getString("phone"));
+        numberInput.setText(doc.getString("number"));  // updated field
         storedPassword = doc.getString("password");
     }
 
     private void saveProfile() {
-        String newName      = nameInput.getText().toString().trim();
-        String newPhone     = phoneInput.getText().toString().trim();
-        String currPw       = currentPwInput.getText().toString();
-        String newPw        = newPwInput.getText().toString();
-        String confirmPw    = confirmPwInput.getText().toString();
+        String newName   = nameInput.getText().toString().trim();
+        String newNumber = numberInput.getText().toString().trim();
+        String currPw    = currentPwInput.getText().toString();
+        String newPw     = newPwInput.getText().toString();
+        String confirmPw = confirmPwInput.getText().toString();
 
         if (newName.isEmpty()) {
             nameInput.setError("Name required");
             return;
         }
-        if (newPhone.isEmpty()) {
-            phoneInput.setError("Phone required");
+        if (newNumber.isEmpty()) {
+            numberInput.setError("Number required");
             return;
         }
 
-        Map<String,Object> updates = new HashMap<>();
+        Map<String, Object> updates = new HashMap<>();
         updates.put("name", newName);
-        updates.put("phone", newPhone);
+        updates.put("number", newNumber);  // updated field
 
         // If any password field is filled, validate all
         if (!currPw.isEmpty() || !newPw.isEmpty() || !confirmPw.isEmpty()) {
@@ -177,13 +167,11 @@ public class ProfileActivity extends AppCompatActivity {
             }
             updates.put("password", newPw);
 
-            // Also update Firebase Auth password if changing password
+            // Also update Firebase Auth password
             FirebaseUser user = mAuth.getCurrentUser();
             if (user != null) {
                 user.updatePassword(newPw)
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "Firebase Auth password updated");
-                        })
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "Firebase Auth password updated"))
                         .addOnFailureListener(e -> {
                             Log.e(TAG, "Error updating Firebase Auth password", e);
                             Toast.makeText(this, "Failed to update authentication password", Toast.LENGTH_SHORT).show();
@@ -196,7 +184,6 @@ public class ProfileActivity extends AppCompatActivity {
                 .update(updates)
                 .addOnSuccessListener(a -> {
                     Toast.makeText(this, "Profile updated", Toast.LENGTH_LONG).show();
-                    // Clear password fields
                     currentPwInput.setText("");
                     newPwInput.setText("");
                     confirmPwInput.setText("");

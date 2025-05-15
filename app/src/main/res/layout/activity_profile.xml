@@ -22,7 +22,6 @@
                 android:background="@color/mild_green"
                 android:orientation="horizontal"
                 android:padding="16dp"
-                android:layout_weight="1"
                 android:layout_marginBottom="12dp">
 
                 <TextView
@@ -35,106 +34,110 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-        <!-- Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name"
-            android:paddingHorizontal="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/nameInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Email (read-only) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/emailInput"
+            <!-- Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:enabled="false" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Name"
+                android:paddingHorizontal="16dp">
 
-        <!-- Phone -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Phone"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/nameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/phoneInput"
+            <!-- Email (read-only) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Email"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp">
 
-        <!-- Current Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Current Password"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/currentPasswordInput"
+            <!-- Number -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/numberLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:paddingHorizontal="16dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Number"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp">
 
-        <!-- New Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="New Password"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/numberInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/newPasswordInput"
+            <!-- Current Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/currentPasswordLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Current Password"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp">
 
-        <!-- Confirm New Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Confirm Password"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="16dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/currentPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/confirmPasswordInput"
+            <!-- New Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/newPasswordLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="New Password"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp">
 
-        <!-- Save Button -->
-        <Button
-            android:id="@+id/saveProfileBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Changes"
-            android:layout_marginTop="32dp"
-            android:backgroundTint="@color/mild_green"
-            android:layout_gravity="center"
-            android:paddingHorizontal="50dp"
-            />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/newPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Confirm New Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/confirmPasswordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm Password"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirmPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/saveProfileBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Changes"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/mild_green"
+                android:layout_gravity="center"
+                android:paddingHorizontal="50dp" />
         </LinearLayout>
     </ScrollView>
 
